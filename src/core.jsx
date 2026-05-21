@@ -83,7 +83,7 @@ export default function OilEnergyDashboard() {
 
 
   return (
-    <div className="h-screen w-screen overflow-hidden bg-[#05070d] text-white flex font-sans zoom-[0.65]">
+    <div className="h-screen w-screen overflow-hidden bg-[#05070d] text-white flex font-sans">
       {/* Left Sidebar */}
       <aside className="w-[78px] border-r border-white/[0.06] bg-[#070b12] flex flex-col items-center justify-between py-6">
         <div className="flex flex-col items-center gap-5">
@@ -153,7 +153,7 @@ export default function OilEnergyDashboard() {
       </div>
 
         {/* Main Grid */}
-        <main className="flex-1 overflow-hidden p-5">
+        <main className="flex-1 overflow-hidden p-3">
           {activeTab === 'dashboard' && (
             <div className="grid grid-cols-12 gap-5 h-full">
           {/* Center Section */}
