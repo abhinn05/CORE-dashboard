@@ -83,7 +83,7 @@ export default function OilEnergyDashboard() {
 
 
   return (
-    <div className="h-screen w-screen overflow-hidden bg-[#05070d] text-white flex font-sans scale-[0.82] origin-top-left">
+    <div className="h-screen w-screen overflow-hidden bg-[#05070d] text-white flex font-sans">
       {/* Left Sidebar */}
       <aside className="w-[78px] border-r border-white/[0.06] bg-[#070b12] flex flex-col items-center justify-between py-6">
         <div className="flex flex-col items-center gap-5">
