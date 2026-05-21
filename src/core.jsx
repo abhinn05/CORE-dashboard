@@ -4,7 +4,7 @@ export default function OilEnergyDashboard() {
   const [authenticated, setAuthenticated] = useState(false);
   const [password, setPassword] = useState('');
 
-  const correctPassword = 'Abhinn1445';
+  const correctPassword = 'Abhinn14';
   const [activeTab, setActiveTab] = useState('dashboard');
   const bottomMetrics = [
     { name: 'DXY', value: '104.12', change: '-0.42%' },
