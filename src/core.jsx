@@ -1,6 +1,10 @@
 import { useState } from 'react';
 
 export default function OilEnergyDashboard() {
+  const [authenticated, setAuthenticated] = useState(false);
+  const [password, setPassword] = useState('');
+
+  const correctPassword = 'Abhinn1445';
   const [activeTab, setActiveTab] = useState('dashboard');
   const bottomMetrics = [
     { name: 'DXY', value: '104.12', change: '-0.42%' },
@@ -28,6 +32,55 @@ export default function OilEnergyDashboard() {
     '3M': [30, 45, 60, 80, 110, 140, 170, 190, 220, 250, 290, 330],
     '1Y': [20, 35, 50, 70, 95, 130, 170, 220, 260, 310, 360, 420],
   };
+
+
+  if (!authenticated) {
+  return (
+      <div className="h-screen w-screen bg-[#05070d] flex items-center justify-center text-white">
+
+        <div className="w-[430px] rounded-[32px] bg-[#0a0f18] border border-white/[0.05] p-10 shadow-2xl">
+
+          <p className="text-xs uppercase tracking-[0.3em] text-gray-500">
+            Futures First
+          </p>
+
+          <h1 className="text-5xl font-black mt-4 tracking-tight">
+            CORE Access
+          </h1>
+
+          <p className="text-gray-400 mt-5 leading-relaxed">
+            Confidential Oil & Energy Intelligence Dashboard
+          </p>
+
+          <div className="mt-8">
+            <input
+              type="password"
+              placeholder="Enter Access Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full h-14 rounded-2xl bg-black/30 border border-white/[0.08] px-5 outline-none text-white"
+            />
+
+            <button
+              onClick={() => {
+                if (password === correctPassword) {
+                  setAuthenticated(true);
+                } else {
+                  alert('Incorrect Password');
+                }
+              }}
+              className="w-full h-14 rounded-2xl bg-cyan-400 text-black font-black mt-5 hover:opacity-90 transition-all duration-200"
+            >
+              Enter Dashboard
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+    );
+  }
+
 
   return (
     <div className="h-screen w-screen overflow-hidden bg-[#05070d] text-white flex font-sans">
