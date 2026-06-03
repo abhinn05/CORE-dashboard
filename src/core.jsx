@@ -20,8 +20,13 @@ export default function OilEnergyDashboard() {
   const [authenticated, setAuthenticated] = useState(false);
   const [password, setPassword] = useState('');
 
+<<<<<<< HEAD
   const correctPassword = 'Abhinn1445';
   const [activeTab, setActiveTab] = useState('master');
+=======
+  const correctPassword = 'Abhinn14';
+  const [activeTab, setActiveTab] = useState('dashboard');
+>>>>>>> 56c5ff9eda7bfa1c233b92a1864626b3cc939f0b
   const bottomMetrics = [
     { name: 'DXY', value: '104.12', change: '-0.42%' },
     { name: 'OVX', value: '36.8', change: '+3.1%' },
@@ -44,6 +49,56 @@ export default function OilEnergyDashboard() {
 
 
   if (!authenticated) {
+<<<<<<< HEAD
+=======
+  return (
+      <div className="h-screen w-screen bg-[#05070d] flex items-center justify-center text-white">
+
+        <div className="w-[430px] rounded-[32px] bg-[#0a0f18] border border-white/[0.05] p-10 shadow-2xl">
+
+          <p className="text-xs uppercase tracking-[0.3em] text-gray-500">
+            Futures First
+          </p>
+
+          <h1 className="text-5xl font-black mt-4 tracking-tight">
+            CORE Access
+          </h1>
+
+          <p className="text-gray-400 mt-5 leading-relaxed">
+            Confidential Oil & Energy Intelligence Dashboard
+          </p>
+
+          <div className="mt-8">
+            <input
+              type="password"
+              placeholder="Enter Access Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full h-14 rounded-2xl bg-black/30 border border-white/[0.08] px-5 outline-none text-white"
+            />
+
+            <button
+              onClick={() => {
+                if (password === correctPassword) {
+                  setAuthenticated(true);
+                } else {
+                  alert('Incorrect Password');
+                }
+              }}
+              className="w-full h-14 rounded-2xl bg-cyan-400 text-black font-black mt-5 hover:opacity-90 transition-all duration-200"
+            >
+              Enter Dashboard
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+    );
+  }
+
+
+>>>>>>> 56c5ff9eda7bfa1c233b92a1864626b3cc939f0b
   return (
       <div className="min-h-screen w-screen bg-[#05070d] flex items-center justify-center text-white">
 
@@ -134,7 +189,18 @@ export default function OilEnergyDashboard() {
       </div>
 
         {/* Main Grid */}
+<<<<<<< HEAD
         <main className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden px-2 py-3 xl:px-3 xl:py-3">
+=======
+        <main className="flex-1 overflow-hidden p-3">
+          {activeTab === 'dashboard' && (
+            <div className="grid grid-cols-12 gap-5 h-full">
+          {/* Center Section */}
+          <section className="col-span-8 flex flex-col gap-5 overflow-hidden">
+            {/* Main Hero Chart */}
+            <div className="flex-1 rounded-[28px] bg-[#0a0f18] border border-white/[0.05] p-7 flex flex-col justify-between relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-[320px] h-[320px] bg-cyan-500/[0.04] blur-[140px] rounded-full" />
+>>>>>>> 56c5ff9eda7bfa1c233b92a1864626b3cc939f0b
 
           {activeTab === "master" && (
             <MasterDashboard openTab={setActiveTab} />
