@@ -1,5 +1,3 @@
-const API_BASE = import.meta.env.VITE_API_URL;
-
 export async function fetchMarket() {
   try {
     const res = await fetch(`${API_BASE}/api/market`);
