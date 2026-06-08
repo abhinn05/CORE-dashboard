@@ -1,5 +1,5 @@
 import CurveChart from "../components/futures/CurveChart";
-import { curveData } from "../data/sampleCurveData";
+import { useCurve } from "../hooks";
 
 import {
   classifyCurve,
@@ -11,18 +11,28 @@ import { computeCalendarSpreads } from "../analytics/spreadEngine";
 import { computeFlys } from "../analytics/flyEngine";
 
 export default function FuturesAnalytics() {
-  const prices = curveData.map(
-    (item) => item.price
-  );
+  const { data: live } = useCurve();
+  const effective = live ?? [];
 
-  const regime = classifyCurve(prices);
-  const slope = curveSlope(prices);
-  const steep = steepness(prices);
+  const prices = effective.map((item) => item.price);
 
-  const spreads =
-    computeCalendarSpreads(prices);
+  const regime = prices.length > 1 ? classifyCurve(prices) : "N/A";
+  const slope = prices.length > 1 ? curveSlope(prices) : null;
+  const steep = prices.length > 1 ? steepness(prices) : null;
 
-  const flys = computeFlys(prices);
+  const spreads = prices.length > 1 ? computeCalendarSpreads(prices) : [];
+
+  const flys = prices.length > 2 ? computeFlys(prices) : [];
+
+  const liveInterpretation = prices.length > 1 ? (
+    regime.includes("Backwardation") 
+      ? `Current curve exhibits ${regime.toLowerCase()}. Prompt months trade at a premium to deferred contracts, suggesting tight near-term supply and strong current demand. Front-end spreads remain robust while the back-end curve slopes downward.`
+      : regime.includes("Contango")
+      ? `Current curve exhibits ${regime.toLowerCase()}. Deferred contracts trade above prompt months, suggesting adequate inventory levels and limited near-term supply stress. Front-end spreads remain soft while the back-end curve continues to steepen.`
+      : `Current curve exhibits a ${regime.toLowerCase()} structure. Spreads are relatively flat, indicating a balanced market without significant near-term supply or demand stress.`
+  ) : "Waiting for live curve data...";
+
+  const marketInterpretation = live?.marketInterpretation || live?.interpretation || liveInterpretation;
 
   return (
     <div className="h-full w-full overflow-y-auto overflow-x-hidden pb-8">
@@ -34,7 +44,7 @@ export default function FuturesAnalytics() {
           Futures Curve Analytics
         </h2>
 
-        <CurveChart data={curveData} />
+        <CurveChart data={effective} />
       </div>
 
       {/* Regime */}
@@ -43,7 +53,7 @@ export default function FuturesAnalytics() {
           Current Regime
         </p>
 
-        <h2 className="text-5xl font-black mt-4 text-orange-400">
+        <h2 className={`text-5xl font-black mt-4 ${regime.includes('Contango') ? 'text-red-400' : regime.includes('Backwardation') ? 'text-green-400' : 'text-gray-400'}`}>
           {regime}
         </h2>
 
@@ -55,7 +65,7 @@ export default function FuturesAnalytics() {
             </span>
 
             <span>
-              {slope.toFixed(2)}
+          {slope != null ? slope.toFixed(2) : "N/A"}
             </span>
           </div>
 
@@ -65,7 +75,7 @@ export default function FuturesAnalytics() {
             </span>
 
             <span>
-              {steep.toFixed(2)}%
+          {steep != null ? steep.toFixed(2) + "%" : "N/A"}
             </span>
           </div>
 
@@ -134,14 +144,7 @@ export default function FuturesAnalytics() {
         </h3>
 
         <p className="text-gray-400 leading-relaxed">
-          Current curve exhibits moderate
-          contango. Deferred contracts
-          trade above prompt months,
-          suggesting adequate inventory
-          levels and limited near-term
-          supply stress. Front-end spreads
-          remain soft while the back-end
-          curve continues to steepen.
+          {marketInterpretation}
         </p>
 
       </div>

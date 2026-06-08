@@ -34,6 +34,7 @@ const sidebarItems = [
     section: "RESEARCH",
     items: [
       { icon: "◧", id: "quant", label: "Quant Lab" },
+      { icon: "⚠️", id: "risk", label: "Risk Monitor" },
       { icon: "📈", id: "portfolio", label: "Portfolio Risk" },
     ],
   },

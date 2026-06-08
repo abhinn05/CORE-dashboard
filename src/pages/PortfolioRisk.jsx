@@ -13,28 +13,21 @@ import {
 } from "recharts";
 import DashboardCard from "../components/DashboardCard";
 import SectionHeader from "../components/SectionHeader";
-
-const riskData = [
-  { name: "W1", long: 420, short: 180, net: 240 },
-  { name: "W2", long: 430, short: 175, net: 255 },
-  { name: "W3", long: 445, short: 170, net: 275 },
-  { name: "W4", long: 460, short: 168, net: 292 },
-  { name: "W5", long: 475, short: 160, net: 315 },
-  { name: "W6", long: 485, short: 158, net: 327 },
-  { name: "W7", long: 500, short: 155, net: 345 },
-];
-
-const summaryMetrics = [
-  { title: "Long Exposure", value: "58%" },
-  { title: "Short Exposure", value: "42%" },
-  { title: "Net Exposure", value: "16%" },
-  { title: "VaR", value: "4.8%" },
-  { title: "Drawdown", value: "8.7%" },
-  { title: "Risk Budget", value: "14%" },
-];
+import { useMarket } from "../hooks";
 
 export default function PortfolioRisk() {
-  const memoizedRiskData = useMemo(() => riskData, []);
+  const { data: liveMarket } = useMarket();
+  const effectiveRisk = liveMarket?.portfolioRisk ?? {};
+  const memoizedRiskData = useMemo(() => effectiveRisk.riskData ?? [], [effectiveRisk.riskData]);
+  
+  const summaryMetrics = [
+    { title: "Long Exposure", value: effectiveRisk.longExposure ?? "N/A" },
+    { title: "Short Exposure", value: effectiveRisk.shortExposure ?? "N/A" },
+    { title: "Net Exposure", value: effectiveRisk.netExposure ?? "N/A" },
+    { title: "VaR", value: effectiveRisk.var ?? "N/A" },
+    { title: "Drawdown", value: effectiveRisk.drawdown ?? "N/A" },
+    { title: "Risk Budget", value: effectiveRisk.riskBudget ?? "N/A" },
+  ];
 
   return (
     <div className="h-full w-full overflow-y-auto overflow-x-hidden space-y-5 pb-8">
@@ -91,20 +84,17 @@ export default function PortfolioRisk() {
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
         <DashboardCard title="Capital Usage">
           <p className="text-gray-400">
-            Current risk budget is aligned to a conservative portfolio allocation,
-            with 58% long exposure and 42% short protection.
+            {effectiveRisk.capitalUsage ?? "Waiting for live portfolio data..."}
           </p>
         </DashboardCard>
         <DashboardCard title="Stress Scenario">
           <p className="text-gray-400">
-            A 5% shock to crude prices would move VaR and drawdown expectations
-            toward the current budget limit, reinforcing disciplined sizing.
+            {effectiveRisk.stressScenario ?? "Waiting for live portfolio data..."}
           </p>
         </DashboardCard>
         <DashboardCard title="Liquidity Profile">
           <p className="text-gray-400">
-            Core positions remain in liquid futures and swaps, supporting fast
-            risk reduction if exposures shift.
+            {effectiveRisk.liquidityProfile ?? "Waiting for live portfolio data..."}
           </p>
         </DashboardCard>
       </div>

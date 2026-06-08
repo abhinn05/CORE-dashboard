@@ -1,5 +1,4 @@
-import { geopoliticalData }
-from "../data/geopoliticalData";
+import { useGeopolitical } from "../hooks";
 
 import {
   overallRisk,
@@ -10,15 +9,14 @@ from "../analytics/geopoliticalEngine";
 
 export default function GeopoliticalRisk() {
 
-  const risk =
-    overallRisk(
-      geopoliticalData
-    );
+  const { data: live } = useGeopolitical();
+  const effective = live ?? [];
 
-  const signal =
-    geopoliticalSignal(
-      geopoliticalData
-    );
+  const risk = effective.length > 0 ? overallRisk(effective) : null;
+  const signal = effective.length > 0 ? geopoliticalSignal(effective) : "N/A";
+  const percent = (value) => value == null || value === "N/A" ? "N/A" : String(value).includes("%") ? value : `${value}%`;
+  const byRegion = Object.fromEntries(effective.map((item) => [item.region, item]));
+  const level = (value) => value == null || value === "N/A" ? "N/A" : value >= 85 ? "Severe" : value >= 65 ? "Elevated" : value <= 40 ? "Low" : "Watch";
 
   return (
 
@@ -40,7 +38,7 @@ export default function GeopoliticalRisk() {
 
       </div>
 
-      {geopoliticalData.map((item) => {
+      {effective.map((item) => {
 
   const riskColor =
     item.risk >= 85
@@ -48,6 +46,13 @@ export default function GeopoliticalRisk() {
       : item.risk >= 75
       ? "text-orange-400"
       : "text-yellow-400";
+
+  const bgRiskColor =
+    item.risk >= 85
+      ? "bg-red-400"
+      : item.risk >= 75
+      ? "bg-orange-400"
+      : "bg-yellow-400";
 
   return (
 
@@ -72,14 +77,14 @@ export default function GeopoliticalRisk() {
         <span>Risk Score</span>
 
         <span className="font-bold">
-          {item.risk}
+          {percent(item.risk)}
         </span>
       </div>
 
       <div className="mt-4 h-2 bg-white/5 rounded-full">
 
         <div
-          className="h-2 bg-orange-400 rounded-full"
+          className={`h-2 ${bgRiskColor} rounded-full`}
           style={{
             width: `${item.risk}%`
           }}
@@ -99,13 +104,13 @@ export default function GeopoliticalRisk() {
           Overall Risk
         </p>
 
-        <h2 className="text-5xl font-black mt-4 text-red-400">
+        <h2 className={`text-5xl font-black mt-4 ${signal === 'Extreme Risk' ? 'text-red-400' : signal === 'Elevated Risk' ? 'text-orange-400' : signal === 'Low Risk' ? 'text-green-400' : signal === 'Moderate Risk' ? 'text-yellow-400' : 'text-gray-400'}`}>
           {signal}
         </h2>
 
         <div className="mt-8 flex justify-between">
           <span>Risk Score</span>
-          <span>{risk}</span>
+          <span>{percent(risk)}</span>
         </div>
 
         <div className="mt-4 h-2 bg-white/5 rounded-full">
@@ -113,7 +118,7 @@ export default function GeopoliticalRisk() {
           <div
             className="h-2 bg-red-400 rounded-full"
             style={{
-              width: `${risk}%`
+              width: risk != null ? `${risk}%` : "0%"
             }}
           />
 
@@ -128,7 +133,7 @@ export default function GeopoliticalRisk() {
         </p>
 
         <h2 className="text-5xl font-black mt-4 text-red-300">
-          {supplyAtRisk()}M
+          {effective.length > 0 ? `${supplyAtRisk(effective)}M` : "N/A"}
         </h2>
 
         <p className="mt-3 text-gray-400">
@@ -144,7 +149,7 @@ export default function GeopoliticalRisk() {
         </p>
 
         <h2 className="text-5xl font-black mt-4 text-orange-400">
-          82%
+          {percent(byRegion["Red Sea"]?.risk ?? risk)}
         </h2>
 
         <p className="mt-3 text-gray-400">
@@ -160,11 +165,11 @@ export default function GeopoliticalRisk() {
         </p>
 
         <h2 className="text-5xl font-black mt-4 text-yellow-300">
-          Severe
+          {level(byRegion.Russia?.risk ?? risk)}
         </h2>
 
         <p className="mt-3 text-gray-400">
-          Russian crude flows affected
+          {byRegion.Russia?.description ?? "Waiting for live geopolitical data..."}
         </p>
 
       </div>
@@ -176,11 +181,11 @@ export default function GeopoliticalRisk() {
         </p>
 
         <h2 className="text-5xl font-black mt-4 text-orange-400">
-          Strong
+          {level(byRegion.OPEC?.risk ?? risk)}
         </h2>
 
         <p className="mt-3 text-gray-400">
-          Production cuts maintained
+          {byRegion.OPEC?.description ?? "Waiting for live geopolitical data..."}
         </p>
 
       </div>
@@ -192,11 +197,11 @@ export default function GeopoliticalRisk() {
         </p>
 
         <h2 className="text-5xl font-black mt-4 text-red-300">
-          72%
+          {percent(byRegion["Red Sea"]?.risk ?? risk)}
         </h2>
 
         <p className="mt-3 text-gray-400">
-          Suez route pressure
+          {byRegion["Red Sea"]?.description ?? "Waiting for live geopolitical data..."}
         </p>
 
       </div>

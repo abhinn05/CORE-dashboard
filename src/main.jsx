@@ -2,9 +2,14 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import './index.css'
 import OilEnergyDashboard from './core.jsx'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+
+const queryClient = new QueryClient();
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <OilEnergyDashboard />
+    <QueryClientProvider client={queryClient}>
+      <OilEnergyDashboard />
+    </QueryClientProvider>
   </React.StrictMode>,
 )

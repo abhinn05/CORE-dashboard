@@ -1,56 +1,40 @@
 import DashboardCard from "../components/DashboardCard";
 import SectionHeader from "../components/SectionHeader";
-
-const riskPanels = [
-  {
-    title: "Market Volatility",
-    score: "HIGH",
-    detail: "Energy vol metrics remain above their 30-day averages.",
-    color: "text-orange-400",
-  },
-  {
-    title: "Liquidity Buffer",
-    score: "Moderate",
-    detail: "Capital reserves remain aligned to a conservative risk budget.",
-    color: "text-cyan-400",
-  },
-  {
-    title: "Macro Shock",
-    score: "Elevated",
-    detail: "Rate and dollar moves are the primary shock drivers.",
-    color: "text-red-400",
-  },
-  {
-    title: "Position Defense",
-    score: "14%",
-    detail: "Current risk budget is preserved through selective hedging.",
-    color: "text-green-400",
-  },
-];
+import { useMarket } from "../hooks";
 
 export default function Risk() {
+  const { data: liveMarket } = useMarket();
+  const effectiveRisk = liveMarket?.riskMonitor ?? {};
+  const riskPanels = effectiveRisk.panels ?? [];
+
   return (
     <div className="space-y-5">
       <SectionHeader title="Risk Monitor" subtitle="Core risk factors and stress signals" />
 
       <div className="grid grid-cols-1 xl:grid-cols-4 gap-5">
-        {riskPanels.map((panel) => (
-          <DashboardCard key={panel.title} title={panel.title} className="p-5">
-            <p className={`text-4xl font-black ${panel.color}`}>{panel.score}</p>
-            <p className="mt-4 text-gray-400">{panel.detail}</p>
-          </DashboardCard>
-        ))}
+        {riskPanels.length > 0 ? (
+          riskPanels.map((panel) => (
+            <DashboardCard key={panel.title} title={panel.title} className="p-5">
+              <p className={`text-4xl font-black ${panel.color || "text-white"}`}>{panel.score}</p>
+              <p className="mt-4 text-gray-400">{panel.detail}</p>
+            </DashboardCard>
+          ))
+        ) : (
+          <div className="col-span-4 rounded-[20px] bg-white/[0.03] border border-white/[0.04] p-5 text-center">
+            <p className="text-gray-500">Waiting for live risk data...</p>
+          </div>
+        )}
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
         <DashboardCard title="Geopolitical Summary" badge="See Geo">
-          <p className="text-gray-400">High-level geopolitical risk is summarized here; use the dedicated Geopolitical Risk page for region-specific escalation and supply-impact analysis.</p>
+          <p className="text-gray-400">{effectiveRisk.geoSummary ?? "Waiting for live geopolitical data..."}</p>
         </DashboardCard>
         <DashboardCard title="Stress Profile" badge="Live">
-          <p className="text-gray-400">Stress levels remain elevated across energy, credit, and liquidity channels without introducing duplicate geopolitical sections.</p>
+          <p className="text-gray-400">{effectiveRisk.stressProfile ?? "Waiting for live stress profile data..."}</p>
         </DashboardCard>
         <DashboardCard title="Scenario Engine" badge="Signal">
-          <p className="text-gray-400">Price and volatility scenarios are monitored separately from dedicated correlation and geopolitics workflows.</p>
+          <p className="text-gray-400">{effectiveRisk.scenarioEngine ?? "Waiting for live scenario data..."}</p>
         </DashboardCard>
       </div>
     </div>

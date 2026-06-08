@@ -5,60 +5,70 @@ import {
   Tooltip,
 } from "recharts";
 
-import quantData from "../data/quantData";
+import { useQuant } from "../hooks";
 
 import {
-  correlationColor,
   getVolatilityColor,
 } from "../analytics/quantEngine";
 
 export default function QuantAnalytics() {
-  return (
-    <div className="h-full grid grid-cols-12 gap-5">
+  const { data: live } = useQuant();
+  const effective = live ?? {
+    betaSeries: [],
+    momentumSignals: [],
+    volatilityRegimes: [],
+    arbitrage: {},
+    signalStrengths: [],
+    stats: []
+  };
 
-      <div className="col-span-7 rounded-[28px] bg-[#0a0f18] border border-white/[0.05] p-8">
+  return (
+    <div className="h-full w-full overflow-y-auto overflow-x-hidden pb-8">
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-5">
+
+      <div className="xl:col-span-7 rounded-[28px] bg-[#0a0f18] border border-white/[0.05] p-8">
 
         <h2 className="text-4xl font-black">
           Quant Analytics
         </h2>
 
-        <div className="mt-8 grid grid-cols-2 gap-5">
+        <div className="mt-8 grid grid-cols-1 xl:grid-cols-2 gap-5">
 
-          <div className="h-[180px] rounded-[24px] bg-white/[0.03] border border-white/[0.04] p-6">
+          <div className="h-full rounded-[24px] bg-white/[0.03] border border-white/[0.04] p-6 flex flex-col">
 
             <p className="text-sm uppercase tracking-[0.2em] text-gray-500">
               Quant Themes
             </p>
 
             <div className="mt-5 space-y-3 text-sm text-gray-300">
-              <p>Volatility regimes and beta trends are highlighted here. For full cross-asset correlation visuals, use the Correlation page.</p>
+              <p>{effective.quantThemesDescription ?? "Waiting for live quant data..."}</p>
               <div className="rounded-[18px] bg-white/[0.05] p-3">
                 <p className="text-xs uppercase tracking-[0.2em] text-gray-500">Beta Regime</p>
-                <p className="mt-2 text-white">{quantData.betaSeries.slice(-1)[0]?.beta ?? "N/A"} latest</p>
+                <p className="mt-2 text-white">{effective.betaSeries.slice(-1)[0]?.beta ?? "N/A"} latest</p>
               </div>
               <div className="rounded-[18px] bg-white/[0.05] p-3">
                 <p className="text-xs uppercase tracking-[0.2em] text-gray-500">Momentum Breadth</p>
-                <p className="mt-2 text-white">{quantData.momentumSignals.filter((item) => item.signal === "BUY").length} buy signals</p>
+                <p className="mt-2 text-white">{effective.momentumSignals.length > 0 ? `${effective.momentumSignals.filter((item) => item.signal === "BUY").length} buy signals` : "N/A"}</p>
               </div>
             </div>
           </div>
 
           {/* Rolling Beta */}
 
-          <div className="h-[180px] rounded-[24px] bg-white/[0.03] border border-white/[0.04] p-6">
+          <div className="h-full rounded-[24px] bg-white/[0.03] border border-white/[0.04] p-6 flex flex-col">
 
             <p className="text-sm uppercase tracking-[0.2em] text-gray-500">
               Rolling Beta
             </p>
 
-            <div className="h-[110px] mt-4">
+            <div className="flex-1 min-h-[110px] mt-4">
 
               <ResponsiveContainer
                 width="100%"
                 height="100%"
               >
                 <LineChart
-                  data={quantData.betaSeries}
+                  data={effective.betaSeries}
                 >
                   <Tooltip />
 
@@ -76,7 +86,7 @@ export default function QuantAnalytics() {
 
           {/* Volatility */}
 
-          <div className="h-[180px] rounded-[24px] bg-white/[0.03] border border-white/[0.04] p-6">
+          <div className="h-full rounded-[24px] bg-white/[0.03] border border-white/[0.04] p-6 flex flex-col">
 
             <p className="text-sm uppercase tracking-[0.2em] text-gray-500">
               Volatility Regime
@@ -84,7 +94,7 @@ export default function QuantAnalytics() {
 
             <div className="flex gap-2 mt-8">
 
-              {quantData.volatilityRegimes.map(
+              {effective.volatilityRegimes.map(
                 (regime) => (
                   <div
                     key={regime}
@@ -99,7 +109,7 @@ export default function QuantAnalytics() {
 
             <div className="grid grid-cols-4 gap-2 mt-4 text-[10px] text-center text-gray-400">
 
-              {quantData.volatilityRegimes.map(
+                {effective.volatilityRegimes.map(
                 (regime) => (
                   <div key={regime}>
                     {regime}
@@ -112,7 +122,7 @@ export default function QuantAnalytics() {
 
           {/* Momentum */}
 
-          <div className="h-[180px] rounded-[24px] bg-white/[0.03] border border-white/[0.04] p-6">
+          <div className="h-full rounded-[24px] bg-white/[0.03] border border-white/[0.04] p-6 flex flex-col">
 
             <p className="text-sm uppercase tracking-[0.2em] text-gray-500">
               Momentum Signals
@@ -120,7 +130,7 @@ export default function QuantAnalytics() {
 
             <div className="space-y-4 mt-6">
 
-              {quantData.momentumSignals.map(
+              {effective.momentumSignals.map(
                 (item) => (
                   <div
                     key={item.asset}
@@ -147,7 +157,7 @@ export default function QuantAnalytics() {
           </div>
         </div>
 
-        <div className="mt-6 grid grid-cols-2 gap-5">
+        <div className="mt-6 grid grid-cols-1 xl:grid-cols-2 gap-5">
 
           <div className="rounded-[24px] bg-[#111827] border border-purple-500/10 p-5">
 
@@ -155,12 +165,12 @@ export default function QuantAnalytics() {
               Spread Z-Score
             </p>
 
-            <h3 className="text-5xl font-black mt-4 text-purple-400">
-              {quantData.zScore}σ
+              <h3 className="text-5xl font-black mt-4 text-purple-400">
+              {effective.zScore != null ? `${effective.zScore}σ` : "N/A"}
             </h3>
 
             <p className="text-gray-400 mt-3 text-sm">
-              Elevated deviation from mean
+              {effective.zScore != null ? (Math.abs(effective.zScore) > 1.5 ? "Elevated deviation from mean" : "Within normal ranges") : "Waiting for live data..."}
             </p>
 
           </div>
@@ -172,18 +182,18 @@ export default function QuantAnalytics() {
             </p>
 
             <h3 className="text-3xl font-bold mt-4 text-purple-300">
-              {quantData.arbitrage.strategy}
+              {effective.arbitrage?.strategy ?? "N/A"}
             </h3>
 
-            <p className="text-gray-400 mt-3 text-sm">
-              {quantData.arbitrage.description}
+              <p className="text-gray-400 mt-3 text-sm">
+              {effective.arbitrage?.description ?? "Waiting for live quant data..."}
             </p>
 
           </div>
         </div>
       </div>
 
-      <div className="col-span-5 rounded-[28px] bg-[#0f172a] border border-white/[0.05] p-8">
+      <div className="xl:col-span-5 rounded-[28px] bg-[#0f172a] border border-white/[0.05] p-8">
 
         <h3 className="text-2xl font-semibold">
           Signal Strength
@@ -191,14 +201,14 @@ export default function QuantAnalytics() {
 
         <div className="mt-8 space-y-6">
 
-          {quantData.signalStrengths.map(
+          {effective.signalStrengths.map(
             (item) => (
               <div key={item.name}>
 
                 <div className="flex justify-between mb-3">
                   <span>{item.name}</span>
                   <span className="text-cyan-400">
-                    Strong
+                    {String(item.value).includes("%") ? item.value : `${item.value}%`}
                   </span>
                 </div>
 
@@ -217,9 +227,9 @@ export default function QuantAnalytics() {
           )}
         </div>
 
-        <div className="mt-8 grid grid-cols-2 gap-3">
+        <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-3">
 
-          {quantData.stats.map(
+          {effective.stats.map(
             (item) => (
               <div
                 key={item.label}
@@ -236,6 +246,7 @@ export default function QuantAnalytics() {
             )
           )}
         </div>
+      </div>
       </div>
     </div>
   );

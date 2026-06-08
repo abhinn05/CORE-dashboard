@@ -1,8 +1,6 @@
 import CrackChart
 from "../components/crack/CrackChart";
-
-import { crackData }
-from "../data/crackSpreadData";
+import { useCrack } from "../hooks";
 
 import {
   crackTrend,
@@ -14,24 +12,27 @@ from "../analytics/crackSpreadEngine";
 
 export default function CrackSpreadAnalytics() {
 
-  const trend =
-    crackTrend(crackData);
+  const { data: live } = useCrack();
+  const effective = live ?? [];
 
-  const change =
-    crackChange(crackData);
+  const trend = effective.length > 1 ? crackTrend(effective) : "N/A";
+  const change = effective.length > 1 ? crackChange(effective) : null;
+  const signal = effective.length > 1 ? refinerySignal(effective) : "N/A";
 
-  const signal =
-    refinerySignal(crackData);
+  const currentCrack = effective[effective.length - 1]?.crack;
+  const fiveYearAverage = effective.length > 0 ? Number((effective.reduce((sum, item) => sum + item.crack, 0) / effective.length).toFixed(2)) : null;
 
-    const currentCrack = 27;
+  const percentile = effective.length > 0 && currentCrack != null && fiveYearAverage != null 
+    ? crackPercentile(currentCrack, fiveYearAverage) 
+    : null;
 
-const fiveYearAverage = 18;
+  const liveEconomics = effective.length > 1 ? (
+    change >= 0
+      ? `Rising crack spreads indicate stronger refinery profitability. Refiners are incentivized to run harder, increasing crude demand and supporting front-month oil prices.`
+      : `Falling crack spreads indicate weakening refinery margins. Refiners may cut utilization rates, reducing prompt crude demand and weighing on front-month prices.`
+  ) : "Waiting for live crack spread data...";
 
-const percentile =
-  crackPercentile(
-    currentCrack,
-    fiveYearAverage
-  );
+  const refineryEconomics = live?.refineryEconomics || liveEconomics;
 
   return (
     <div className="h-full w-full overflow-y-auto overflow-x-hidden pb-8">
@@ -44,7 +45,7 @@ const percentile =
         </h2>
 
         <CrackChart
-          data={crackData}
+          data={effective}
         />
 
       </div>
@@ -67,7 +68,7 @@ const percentile =
             </span>
 
             <span>
-              +{change}
+          {change != null ? (change > 0 ? '+' : '') + change : "N/A"}
             </span>
           </div>
 
@@ -87,7 +88,7 @@ const percentile =
             </span>
 
             <span>
-              ${currentCrack}
+              {currentCrack != null ? `$${currentCrack}` : "N/A"}
             </span>
           </div>
 
@@ -97,7 +98,7 @@ const percentile =
             </span>
 
             <span>
-              ${fiveYearAverage}
+              {fiveYearAverage != null ? `$${fiveYearAverage}` : "N/A"}
             </span>
           </div>
 
@@ -107,7 +108,7 @@ const percentile =
             </span>
 
             <span>
-              {percentile}th
+              {percentile != null ? `${percentile}th` : "N/A"}
             </span>
           </div>
 
@@ -122,13 +123,7 @@ const percentile =
         </h3>
 
         <p className="text-gray-400 leading-relaxed">
-
-          Rising crack spreads indicate
-          stronger refinery profitability.
-          Refiners are incentivized to run
-          harder, increasing crude demand
-          and supporting front-month oil
-          prices.
+          {refineryEconomics}
 
         </p>
 

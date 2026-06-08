@@ -1,85 +1,76 @@
 import MetricCard from "../components/MetricCard";
 import MacroCard from "../components/macro/MacroCard";
-
-import {
-  marketData,
-} from "../data/marketData";
-
-import {
-  macroData,
-  economicCalendar,
-} from "../data/macroData";
+import { useMacro, useMarket } from "../hooks";
 
 import {
   dollarSignal,
-  chinaDemandSignal,
+  manufacturingDemandSignal,
   macroRegime,
 }
 from "../analytics/macroEngine";
 
 export default function MacroAnalytics() {
 
-  const dollar =
-    dollarSignal(macroData.dxy);
+  const { data: liveMacro } = useMacro();
+  const { data: liveMarket } = useMarket();
 
-  const china =
-    chinaDemandSignal(
-      macroData.pmi
-    );
+  const effectiveMacro = liveMacro ?? { dxy: {}, cpi: {}, fedFunds: {}, gdp: {}, payrolls: {}, pmi: {}, economicCalendar: [] };
+  const effectiveMarket = liveMarket ?? { dxy: {} };
 
-  const regime =
-    macroRegime(macroData);
+  const dollar = dollarSignal(effectiveMacro.dxy || {});
+  const manufacturing = manufacturingDemandSignal(effectiveMacro.pmi || {});
+  const regime = macroRegime(effectiveMacro);
 
   return (
     <div className="h-full w-full overflow-y-auto overflow-x-hidden pb-8">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-5">
 
       <div className="col-span-1">
-        <MetricCard
+          <MetricCard
           title="DXY"
-          value={marketData.dxy.value}
-          change={marketData.dxy.change}
-          trend={marketData.dxy.trend}
+          value={effectiveMarket.dxy?.value}
+          change={effectiveMarket.dxy?.change}
+          trend={effectiveMarket.dxy?.trend}
         />
       </div>
 
       <div className="col-span-1">
         <MacroCard
           title="CPI"
-          value={macroData.cpi.value}
-          change={macroData.cpi.change}
+          value={effectiveMacro.cpi?.value}
+          change={effectiveMacro.cpi?.change}
         />
       </div>
 
       <div className="col-span-1">
         <MacroCard
           title="Fed Funds"
-          value={macroData.fedFunds.value}
-          change={macroData.fedFunds.change}
+          value={effectiveMacro.fedFunds?.value}
+          change={effectiveMacro.fedFunds?.change}
         />
       </div>
 
       <div className="col-span-1">
         <MacroCard
           title="GDP"
-          value={macroData.gdp.value}
-          change={macroData.gdp.change}
+          value={effectiveMacro.gdp?.value}
+          change={effectiveMacro.gdp?.change}
         />
       </div>
 
       <div className="col-span-1">
         <MacroCard
           title="Payrolls"
-          value={macroData.payrolls.value}
-          change={macroData.payrolls.change}
+          value={effectiveMacro.payrolls?.value}
+          change={effectiveMacro.payrolls?.change}
         />
       </div>
 
       <div className="col-span-2">
         <MacroCard
-          title="China PMI"
-          value={macroData.pmi.value}
-          change={macroData.pmi.change}
+          title="Manufacturing PMI"
+          value={effectiveMacro.pmi?.value}
+          change={effectiveMacro.pmi?.change}
         />
       </div>
 
@@ -91,21 +82,25 @@ export default function MacroAnalytics() {
 
         <div className="space-y-4">
 
-          {economicCalendar.map(
-            (item) => (
-              <div
-                key={item.event}
-                className="flex justify-between border-b border-white/[0.05] pb-3"
-              >
-                <span>
-                  {item.event}
-                </span>
+          {effectiveMacro.economicCalendar.length > 0 ? (
+            effectiveMacro.economicCalendar.map(
+              (item) => (
+                <div
+                  key={item.event}
+                  className="flex justify-between border-b border-white/[0.05] pb-3"
+                >
+                  <span>
+                    {item.event}
+                  </span>
 
-                <span className="text-orange-400">
-                  {item.date}
-                </span>
-              </div>
+                  <span className="text-orange-400">
+                    {item.date}
+                  </span>
+                </div>
+              )
             )
+          ) : (
+            <p className="text-sm text-gray-500">Waiting for live calendar data...</p>
           )}
 
         </div>
@@ -118,7 +113,7 @@ export default function MacroAnalytics() {
           Macro Regime
         </p>
 
-        <h2 className="text-5xl font-black mt-4 text-green-400">
+        <h2 className={`text-5xl font-black mt-4 ${regime.includes('Bearish') ? 'text-red-400' : regime.includes('Bullish') ? 'text-green-400' : 'text-gray-400'}`}>
           {regime}
         </h2>
 
@@ -130,20 +125,20 @@ export default function MacroAnalytics() {
             </div>
 
             <div className="flex justify-between">
-                <span>China Demand</span>
-                <span>{china}</span>
+                <span>Manufacturing Demand</span>
+                <span>{manufacturing}</span>
             </div>
 
             <div className="flex justify-between">
                 <span>Macro Score</span>
-                <span>82 / 100</span>
+                <span>{effectiveMacro.macroScore ?? "N/A"}</span>
             </div>
 
             <div className="flex justify-between">
                 <span>Oil Impact</span>
 
-                <span className="text-green-400">
-                    Strong Positive
+                <span className={effectiveMacro.oilImpact?.includes("Negative") ? "text-red-400" : "text-gray-400"}>
+                    {effectiveMacro.oilImpact ?? "N/A"}
                 </span>
             </div>
 

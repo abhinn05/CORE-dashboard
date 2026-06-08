@@ -1,9 +1,5 @@
 import CorrelationHeatmap from "../components/correlation/CorrelationHeatmap";
-
-import {
-  correlations
-}
-from "../data/correlationData";
+import { useCorrelation } from "../hooks";
 
 import {
   strongestPositive,
@@ -14,20 +10,19 @@ from "../analytics/correlationEngine";
 
 export default function CorrelationAnalytics() {
 
-  const positives =
-    strongestPositive(
-      correlations
-    );
+  const { data: live } = useCorrelation();
+  const effective = live ?? [];
 
-  const negatives =
-    strongestNegative(
-      correlations
-    );
+  const positives = effective.length > 0 ? strongestPositive(effective) : [];
+  const negatives = effective.length > 0 ? strongestNegative(effective) : [];
+  const regime = effective.length > 0 ? marketRegime(effective) : "Neutral";
 
-  const regime =
-    marketRegime(
-      correlations
-    );
+  const liveInterpretation = effective.length > 0 ? (
+    regime === "Clustered"
+      ? `Market correlations are tightly clustered across the energy complex. Strong linkages signal regime-based positioning, meaning macro forces and broader market flows are driving crude prices more than isolated supply/demand fundamentals.`
+      : `Energy complex correlations are currently decoupled. Assets are trading on idiosyncratic fundamentals rather than broader macro flows, allowing for greater relative value and spread opportunities.`
+  ) : "Waiting for live correlation data...";
+  const aiInterpretation = live?.aiInterpretation || liveInterpretation;
 
   return (
     <div className="h-full w-full overflow-y-auto overflow-x-hidden pb-8">
@@ -40,7 +35,7 @@ export default function CorrelationAnalytics() {
         </h2>
 
         <CorrelationHeatmap
-          data={correlations}
+          data={effective}
         />
 
       </div>
@@ -63,17 +58,21 @@ export default function CorrelationAnalytics() {
           Strong Positive
         </h3>
 
-        {positives.map((x) => (
-          <div
-            key={x.asset}
-            className="flex justify-between py-2"
-          >
-            <span>{x.asset}</span>
-            <span className="text-green-400">
-              {x.value}
-            </span>
-          </div>
-        ))}
+        {positives.length > 0 ? (
+          positives.map((x) => (
+            <div
+              key={x.asset}
+              className="flex justify-between py-2"
+            >
+              <span>{x.asset}</span>
+              <span className="text-green-400">
+                {x.value}
+              </span>
+            </div>
+          ))
+        ) : (
+          <p className="text-sm text-gray-500">Waiting for live data...</p>
+        )}
 
       </div>
 
@@ -83,17 +82,21 @@ export default function CorrelationAnalytics() {
           Strong Negative
         </h3>
 
-        {negatives.map((x) => (
-          <div
-            key={x.asset}
-            className="flex justify-between py-2"
-          >
-            <span>{x.asset}</span>
-            <span className="text-red-400">
-              {x.value}
-            </span>
-          </div>
-        ))}
+        {negatives.length > 0 ? (
+          negatives.map((x) => (
+            <div
+              key={x.asset}
+              className="flex justify-between py-2"
+            >
+              <span>{x.asset}</span>
+              <span className="text-red-400">
+                {x.value}
+              </span>
+            </div>
+          ))
+        ) : (
+          <p className="text-sm text-gray-500">Waiting for live data...</p>
+        )}
 
       </div>
 
@@ -104,9 +107,7 @@ export default function CorrelationAnalytics() {
         </h3>
 
         <p className="text-gray-400 leading-relaxed">
-          Market correlations are clustering across the energy complex, showing the strongest positive linkages in
-          refined products and the deepest negative divergence with macro risk factors. This signals regime-based
-          positioning rather than isolated commodity moves.
+          {aiInterpretation}
         </p>
 
       </div>

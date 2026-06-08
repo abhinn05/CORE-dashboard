@@ -1,4 +1,5 @@
 export function overallRisk(data) {
+  if (!data.length) return "0";
 
   const avg =
     data.reduce(
@@ -21,9 +22,13 @@ export function geopoliticalSignal(data) {
   if (avg >= 70)
     return "Elevated Risk";
 
+  if (avg <= 40)
+    return "Low Risk";
+
   return "Moderate Risk";
 }
 
-export function supplyAtRisk() {
-  return 3.8;
+export function supplyAtRisk(data = []) {
+  const risk = Number(overallRisk(data));
+  return ((risk / 100) * 5).toFixed(1);
 }

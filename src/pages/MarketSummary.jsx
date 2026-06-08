@@ -1,3 +1,20 @@
+import { 
+  useInventory, 
+  useMarket,
+  useCurve,
+  useCrack,
+  useCftc,
+  useShipping,
+  useMacro
+} from "../hooks";
+import {
+  inventoryTrend,
+} from "../analytics/inventoryEngine";
+import { classifyCurve } from "../analytics/futuresCurve";
+import { refinerySignal } from "../analytics/crackSpreadEngine";
+import { positioningSignal } from "../analytics/cftcEngine";
+import { macroRegime } from "../analytics/macroEngine";
+import { shippingSignal } from "../analytics/shippingEngine";
 import {
   marketBias,
   confidenceScore,
@@ -6,54 +23,68 @@ import {
 from "../analytics/marketSummaryEngine";
 
 export default function MarketSummary() {
+  const { data: liveInventory } = useInventory();
+  const { data: liveMarket } = useMarket();
+  const { data: liveCurve } = useCurve();
+  const { data: liveCrack } = useCrack();
+  const { data: liveCftc } = useCftc();
+  const { data: liveShipping } = useShipping();
+  const { data: liveMacro } = useMacro();
 
-  const bias =
+  const effectiveInventory = liveInventory?.inventoryData ?? (Array.isArray(liveInventory) && liveInventory.length > 0 ? liveInventory : []);
+  const effectiveMarket = liveMarket ?? {};
+  const effectiveCurve = liveCurve ?? [];
+  const effectiveCrack = liveCrack ?? [];
+  const effectiveCftc = liveCftc ?? [];
+  const effectiveShipping = liveShipping ?? { shippingMetrics: {} };
+  const effectiveMacro = liveMacro ?? { dxy: {}, pmi: {} };
+
+  const inventorySignal = effectiveInventory.length > 1 ? inventoryTrend(effectiveInventory) : "N/A";
+
+  const futuresPrices = effectiveCurve.map((item) => item.price).filter(Boolean);
+  const futures = futuresPrices.length > 1 ? classifyCurve(futuresPrices) : "N/A";
+
+  const crack = effectiveCrack.length > 1 ? refinerySignal(effectiveCrack) : "N/A";
+  const cftc = effectiveCftc.length > 0 ? positioningSignal(effectiveCftc) : "N/A";
+  
+  const macro = (effectiveMacro.dxy?.change !== undefined && effectiveMacro.pmi?.value !== undefined)
+    ? macroRegime(effectiveMacro)
+    : "N/A";
+    
+  const shipping = Object.keys(effectiveShipping.shippingMetrics || {}).length > 0
+    ? shippingSignal(effectiveShipping.shippingMetrics)
+    : "N/A";
+
+  const hasAnyData = futuresPrices.length > 1 || effectiveInventory.length > 1 || effectiveCrack.length > 1 || effectiveCftc.length > 0 || Object.keys(effectiveShipping.shippingMetrics || {}).length > 0;
+
+  const bias = hasAnyData ?
     marketBias({
-      futures:
-        "Deep Contango",
+      futures,
+      inventory: inventorySignal,
+      crack,
+      cftc,
+      macro,
+      shipping,
+    }) : "N/A";
 
-      inventory:
-        "Bullish Draw",
-
-      crack:
-        "Very Bullish",
-
-      cftc:
-        "Extremely Bullish",
-
-      macro:
-        "Bullish Macro",
-
-      shipping:
-        "Severely Bullish"
-    });
-
-  const confidence =
+  const confidenceValue =
     confidenceScore({
-      futures: true,
-      inventory: true,
-      crack: true,
-      cftc: true,
-      macro: true,
-      shipping: true
+      futures: futuresPrices.length > 1,
+      inventory: effectiveInventory.length > 1,
+      crack: effectiveCrack.length > 1,
+      cftc: effectiveCftc.length > 0,
+      macro: effectiveMacro.dxy?.change !== undefined,
+      shipping: Object.keys(effectiveShipping.shippingMetrics || {}).length > 0,
     });
+  const confidence = hasAnyData && confidenceValue > 0 ? confidenceValue : "N/A";
 
   const drivers =
     marketDrivers({
-      inventory:
-        "Bullish Draw",
-
-      crack:
-        "Very Bullish",
-
-      cftc:
-        "Extremely Bullish",
-
-      macro:
-        "Bullish Macro",
-
-      shipping:
-        "Severely Bullish"
+      inventory: inventorySignal,
+      crack,
+      cftc,
+      macro,
+      shipping,
     });
 
   return (
@@ -65,7 +96,7 @@ export default function MarketSummary() {
                 AI GENERATED SUMMARY
             </p>
 
-            <h2 className="text-5xl font-black mt-4 text-green-400">
+            <h2 className={`text-5xl font-black mt-4 ${bias.includes('Bearish') ? 'text-red-400' : bias.includes('Bullish') ? 'text-green-400' : 'text-gray-400'}`}>
                 {bias}
             </h2>
 
@@ -95,15 +126,15 @@ export default function MarketSummary() {
                 <div className="space-y-3">
 
                 <div>
-                    • Crowded Fund Positioning
+                    • WTI {effectiveMarket.wti?.change ?? ''} signals prompt crude tension
                 </div>
 
                 <div>
-                    • Elevated Freight Costs
+                    • DXY at {effectiveMarket.dxy?.value ?? 'N/A'} remains the macro swing factor
                 </div>
 
                 <div>
-                    • Macro Event Volatility
+                    • Inventory draw dynamics continue to define prompt balance
                 </div>
 
                 </div>
@@ -119,7 +150,7 @@ export default function MarketSummary() {
         </p>
 
         <h2 className="text-6xl font-black mt-5 text-cyan-400">
-          {confidence}%
+          {confidence !== "N/A" ? `${confidence}%` : "N/A"}
         </h2>
 
         <div className="mt-8 h-3 rounded-full bg-white/[0.05]">
@@ -128,7 +159,7 @@ export default function MarketSummary() {
             className="h-full rounded-full bg-cyan-400"
             style={{
               width:
-                `${confidence}%`
+                confidence !== "N/A" ? `${confidence}%` : "0%"
             }}
           />
 

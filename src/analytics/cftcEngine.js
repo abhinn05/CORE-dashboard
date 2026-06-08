@@ -1,4 +1,6 @@
 export function latestNetPosition(data) {
+  if (!data.length) return 0;
+
   const latest = data[data.length - 1];
 
   return latest.longs - latest.shorts;
@@ -20,6 +22,8 @@ export function positioningSignal(data) {
 }
 
 export function openInterestTrend(data) {
+  if (data.length < 2) return "Flat";
+
   const first = data[0].oi;
   const last = data[data.length - 1].oi;
 
@@ -31,11 +35,11 @@ export function openInterestTrend(data) {
 export function positioningPercentile(data) {
   const latest = latestNetPosition(data);
 
-  const maxPossible = 500;
+  const maxPossible = Math.max(...data.map((item) => Math.abs(item.longs - item.shorts)), 1);
 
-  return Math.round(
+  return Math.max(0, Math.min(100, Math.round(
     (latest / maxPossible) * 100
-  );
+  )));
 }
 
 export function crowdingScore(data) {

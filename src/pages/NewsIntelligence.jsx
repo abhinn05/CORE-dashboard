@@ -1,4 +1,4 @@
-import newsData from "../data/newsData";
+import { useNews } from "../hooks";
 
 import {
   bullishPercentage,
@@ -8,20 +8,15 @@ import {
 } from "../analytics/newsEngine";
 
 export default function NewsIntelligence() {
-  const sentiment =
-    overallSentiment(newsData);
+  const { data: liveNews } = useNews();
+  const effective = liveNews ?? [];
+  const isLive = effective.length > 0;
 
-  const bullish =
-    bullishPercentage(newsData);
-
-  const bearish =
-    bearishPercentage(newsData);
-
-  const neutral =
-    100 - bullish - bearish;
-
-  const narrative =
-    dominantNarrative(newsData);
+  const sentiment = overallSentiment(effective);
+  const bullish = bullishPercentage(effective);
+  const bearish = bearishPercentage(effective);
+  const neutral = typeof bullish === 'number' && typeof bearish === 'number' ? 100 - bullish - bearish : "N/A";
+  const narrative = dominantNarrative(effective);
 
   return (
     <div className="h-full grid grid-cols-12 gap-5">
@@ -35,15 +30,15 @@ export default function NewsIntelligence() {
             </h2>
 
             <p className="text-xs uppercase tracking-[0.25em] text-gray-500 mt-2">
-              Reuters • Bloomberg Style Feed
+              {isLive ? "Live News Feed" : "Waiting for live news..."}
             </p>
           </div>
 
-          <div className="w-3 h-3 rounded-full bg-green-400 animate-pulse" />
+          <div className={`w-3 h-3 rounded-full ${isLive ? "bg-green-400 animate-pulse" : "bg-yellow-400"}`} />
         </div>
 
         <div className="mt-8 space-y-4">
-          {newsData.map((item, index) => (
+          {effective.map((item, index) => (
             <div
               key={index}
               className="rounded-[24px] bg-white/[0.03] border border-white/[0.04] p-6 hover:bg-white/[0.05] transition-all duration-200"
@@ -55,7 +50,9 @@ export default function NewsIntelligence() {
                   ${
                     item.sentiment === "Bullish"
                       ? "bg-green-500/10 text-green-300"
-                      : "bg-red-500/10 text-red-300"
+                      : item.sentiment === "Bearish"
+                      ? "bg-red-500/10 text-red-300"
+                      : "bg-gray-500/10 text-gray-300"
                   }`}
                 >
                   {item.sentiment}
@@ -77,7 +74,7 @@ export default function NewsIntelligence() {
                 </span>
 
                 <span className="text-xs text-gray-500">
-                  Reuters • Live
+                  {item.source ?? "NewsAPI Live"}
                 </span>
 
               </div>
@@ -96,8 +93,8 @@ export default function NewsIntelligence() {
 
           <div className="w-[220px] h-[220px] rounded-full border-[16px] border-green-400 flex flex-col items-center justify-center">
 
-            <h2 className="text-6xl font-black text-green-400">
-              {sentiment.score}%
+            <h2 className={`text-6xl font-black ${sentiment.color}`}>
+              {sentiment.score !== "N/A" ? `${sentiment.score}%` : "N/A"}
             </h2>
 
             <p className="text-gray-400 mt-2">
@@ -113,17 +110,17 @@ export default function NewsIntelligence() {
           {[
             [
               "Bullish Headlines",
-              `${bullish}%`,
+              bullish !== "N/A" ? `${bullish}%` : "N/A",
               "bg-green-400",
             ],
             [
               "Bearish Headlines",
-              `${bearish}%`,
+              bearish !== "N/A" ? `${bearish}%` : "N/A",
               "bg-red-400",
             ],
             [
               "Neutral",
-              `${neutral}%`,
+              neutral !== "N/A" ? `${neutral}%` : "N/A",
               "bg-gray-400",
             ],
           ].map((item, index) => (
@@ -145,7 +142,7 @@ export default function NewsIntelligence() {
                 <div
                   className={`h-full rounded-full ${item[2]}`}
                   style={{
-                    width: item[1],
+                    width: item[1] !== "N/A" ? item[1] : "0%",
                   }}
                 />
 

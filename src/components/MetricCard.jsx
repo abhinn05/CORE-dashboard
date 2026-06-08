@@ -6,10 +6,18 @@ export default function MetricCard({
   badge,
   className = "",
 }) {
+  const numericChange = Number(String(change).replace(/[^0-9.-]/g, ""));
+  const changeText = change == null || change === ""
+    ? ""
+    : String(change).includes("%")
+      ? String(change)
+      : Number.isFinite(numericChange)
+        ? `${numericChange > 0 ? "+" : ""}${numericChange}%`
+        : String(change);
   const trendColor =
-    change?.startsWith("+")
+    changeText.startsWith("+")
       ? "text-green-400"
-      : change?.startsWith("-")
+      : changeText.startsWith("-")
       ? "text-red-400"
       : "text-gray-400";
 
@@ -31,9 +39,9 @@ export default function MetricCard({
         )}
       </div>
 
-      {change && (
+      {changeText && (
         <p className={`mt-2 text-sm font-medium ${trendColor}`}>
-          {change}
+          {changeText}
         </p>
       )}
 

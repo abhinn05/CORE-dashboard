@@ -8,74 +8,66 @@ import {
   YAxis,
 } from "recharts";
 
-import { marketData } from "../data/marketData";
-import MetricCard from "../components/MetricCard";
+import useMarket from "../hooks/useMarket";
+import { useInventory } from "../hooks";
+import { inventoryTrend } from "../analytics/inventoryEngine";
 import SectionHeader from "../components/SectionHeader";
 import DashboardCard from "../components/DashboardCard";
 import AlertCenter from "../components/AlertCenter";
 import TradeRecommendation from "../components/TradeRecommendation";
 
-const intelligenceCards = [
-  {
+export default function MasterDashboard() {
+  const { data: liveMarket } = useMarket();
+  const { data: liveInventory } = useInventory();
+
+  const effectiveMarket = useMemo(() => liveMarket ?? {}, [liveMarket]);
+  const effectiveInventory = useMemo(() => liveInventory?.inventoryData ?? (Array.isArray(liveInventory) && liveInventory.length > 0 ? liveInventory : []), [liveInventory]);
+
+  const inventoryCard = useMemo(() => ({
     title: "Inventory Signal",
-    value: marketData.inventory.value,
-    detail: "Current inventory draw remains a primary supply signal.",
-    accent: "Bullish",
-  },
-  {
-    title: "CFTC Positioning",
-    value: `${marketData.cftc.net}k net`,
-    detail: "Long bias remains dominant.",
-    accent: marketData.cftc.sentiment,
-  },
-  {
-    title: "Shipping Risk",
-    value: "73%",
-    detail: "Red Sea disruptions remain priced in.",
-    accent: "High",
-  },
-  {
-    title: "Macro Regime",
-    value: "Bullish",
-    detail: "Dollar weakness supports energy demand.",
-    accent: "Medium",
-  },
-  {
-    title: "Geopolitical Risk",
-    value: "Critical",
-    detail: "Risk premiums remain elevated.",
-    accent: "Critical",
-  },
-  {
-    title: "Correlation Regime",
-    value: "Clustered",
-    detail: "Energy complex remains aligned.",
-    accent: "Neutral",
-  },
-];
+    value: effectiveInventory[effectiveInventory.length - 1]?.inventory ?? (effectiveMarket.inventory?.value || "N/A"),
+    detail: effectiveMarket.inventory?.detail ?? "N/A",
+    accent: effectiveInventory.length > 1 ? inventoryTrend(effectiveInventory) : "Neutral",
+  }), [effectiveInventory, effectiveMarket]);
 
-const dashboardNavigation = [
-  {
-    title: "Full Intelligence Feed",
-    description: "Open the dedicated News Intelligence page for the complete real-time headline feed.",
-    action: "news",
-  },
-  {
-    title: "Geopolitical Risk",
-    description: "Review event escalation, region-specific risk scores, and supply impact in the geopolitics hub.",
-    action: "geo",
-  },
-  {
-    title: "Inventory Analytics",
-    description: "See the full inventory history, draw analysis, and storage trends in the dedicated page.",
-    action: "inventory",
-  },
-];
+  const cardList = useMemo(() => {
+    const dynamicIntelligenceCards = effectiveMarket.dynamicIntelligenceCards ?? [
+      {
+        title: "CFTC Positioning",
+        value: effectiveMarket.cftc?.value ?? `${effectiveMarket.cftc?.net ?? "N/A"}k net`,
+        detail: effectiveMarket.cftc?.detail ?? "N/A",
+        accent: effectiveMarket.cftc?.sentiment ?? "Neutral",
+      },
+      {
+        title: "Shipping Risk",
+        value: effectiveMarket.shipping?.value ?? "N/A",
+        detail: effectiveMarket.shipping?.detail ?? "N/A",
+        accent: effectiveMarket.shipping?.accent ?? "Neutral",
+      },
+      {
+        title: "Macro Regime",
+        value: effectiveMarket.macro?.value ?? "N/A",
+        detail: effectiveMarket.macro?.detail ?? "N/A",
+        accent: effectiveMarket.macro?.accent ?? "Neutral",
+      },
+      {
+        title: "Geopolitical Risk",
+        value: effectiveMarket.geopolitical?.value ?? "N/A",
+        detail: effectiveMarket.geopolitical?.detail ?? "N/A",
+        accent: effectiveMarket.geopolitical?.accent ?? "Neutral",
+      },
+      {
+        title: "Correlation Regime",
+        value: effectiveMarket.correlation?.value ?? "N/A",
+        detail: effectiveMarket.correlation?.detail ?? "N/A",
+        accent: effectiveMarket.correlation?.accent ?? "Neutral",
+      },
+    ];
+    return [inventoryCard, ...dynamicIntelligenceCards];
+  }, [inventoryCard, effectiveMarket]);
 
-export default function MasterDashboard({ openTab }) {
-  const kpis = useMemo(() => marketData.kpis, []);
-  const alerts = useMemo(() => marketData.alertRules, []);
-  const recommendation = useMemo(() => marketData.tradeRecommendation, []);
+  const alerts = useMemo(() => effectiveMarket.alertRules || [], [effectiveMarket]);
+  const recommendation = useMemo(() => effectiveMarket.tradeRecommendation || {}, [effectiveMarket]);
 
   return (
     <div className="h-full w-full overflow-y-auto overflow-x-hidden space-y-4 pb-6">
@@ -91,7 +83,7 @@ export default function MasterDashboard({ openTab }) {
           <DashboardCard title="WTI Price Signal" badge="Market" className="p-2">
             <div className="h-[130px]">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={marketData.priceHistory} margin={{ top: 8, right: 0, left: 0, bottom: 0 }}>
+                <AreaChart data={effectiveMarket.priceHistory} margin={{ top: 8, right: 0, left: 0, bottom: 0 }}>
                   <defs>
                     <linearGradient id="mainGradient" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="0%" stopColor="#22d3ee" stopOpacity={0.65} />
@@ -108,7 +100,7 @@ export default function MasterDashboard({ openTab }) {
           </DashboardCard>
 
           <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
-            {intelligenceCards.map((card) => (
+            {cardList.map((card) => (
               <DashboardCard key={card.title} title={card.title} badge={card.accent} className="p-4">
                 <p className="text-3xl font-black text-white">{card.value}</p>
                 <p className="mt-3 text-sm text-gray-400">{card.detail}</p>
@@ -122,19 +114,19 @@ export default function MasterDashboard({ openTab }) {
             <div className="space-y-4 text-sm text-gray-300">
               <div className="flex items-center justify-between">
                 <span>Current outlook</span>
-                <span className="text-green-400">Bullish</span>
+                <span className={recommendation.bias?.includes('Bearish') ? 'text-red-400' : 'text-green-400'}>{recommendation.bias || 'N/A'}</span>
               </div>
               <div className="flex items-center justify-between">
-                <span>Volatility</span>
-                <span className="text-amber-300">Elevated</span>
+                <span>Confidence</span>
+                <span className="text-cyan-400">{recommendation.confidence || 'N/A'}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span>Volatility (OVX)</span>
+                <span className={effectiveMarket.ovx?.status?.includes('High') ? "text-red-400" : "text-amber-300"}>{effectiveMarket.ovx?.status || 'N/A'}</span>
               </div>
               <div className="flex items-center justify-between">
                 <span>Supply momentum</span>
-                <span className="text-green-400">Tightening</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span>Demand signal</span>
-                <span className="text-cyan-400">Stable</span>
+                <span className={effectiveMarket.inventory?.momentum?.includes('Tightening') ? 'text-green-400' : 'text-red-400'}>{effectiveMarket.inventory?.momentum || 'N/A'}</span>
               </div>
             </div>
           </DashboardCard>

@@ -3,11 +3,19 @@ export default function MacroCard({
   value,
   change,
 }) {
+  const numericChange = Number(String(change).replace(/[^0-9.-]/g, ""));
+  const changeText = change == null || change === ""
+    ? ""
+    : String(change).includes("%")
+      ? String(change)
+      : Number.isFinite(numericChange)
+        ? `${numericChange > 0 ? "+" : ""}${numericChange}%`
+        : String(change);
 
   const color =
-    change > 0
+    numericChange > 0
       ? "text-green-400"
-      : change < 0
+      : numericChange < 0
       ? "text-red-400"
       : "text-gray-400";
 
@@ -23,8 +31,7 @@ export default function MacroCard({
       </h2>
 
       <p className={`mt-2 ${color}`}>
-        {change > 0 ? "+" : ""}
-        {change}
+        {changeText}
       </p>
 
     </div>

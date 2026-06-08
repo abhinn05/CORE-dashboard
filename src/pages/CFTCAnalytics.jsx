@@ -1,6 +1,5 @@
 import PositioningChart from "../components/cftc/PositioningChart";
-
-import { cftcData } from "../data/cftcData";
+import { useCftc } from "../hooks";
 
 import {
   latestNetPosition,
@@ -13,20 +12,25 @@ from "../analytics/cftcEngine";
 
 export default function CFTCAnalytics() {
 
-  const signal =
-    positioningSignal(cftcData);
+  const { data: liveCftc } = useCftc();
+  const effective = liveCftc ?? [];
 
-  const net =
-    latestNetPosition(cftcData);
+  const signal = effective.length > 0 ? positioningSignal(effective) : "N/A";
+  const net = effective.length > 0 ? latestNetPosition(effective) : null;
+  const oiTrend = effective.length > 1 ? openInterestTrend(effective) : "N/A";
+  const percentile = effective.length > 0 ? positioningPercentile(effective) : null;
+  const crowding = effective.length > 0 ? crowdingScore(effective) : "N/A";
+  const latest = effective[effective.length - 1] ?? {};
 
-  const oiTrend =
-    openInterestTrend(cftcData);
+  const liveInterpretation = effective.length > 1 ? (
+    signal.includes("Bullish") 
+      ? `Managed money positioning is net long with open interest trending ${oiTrend.toLowerCase()}. This combination suggests strong speculative participation and supports a bullish outlook.`
+      : signal.includes("Bearish")
+      ? `Managed money positioning is skewed short. Continued selling pressure could weigh on prices, though high crowding introduces short-covering squeeze risk.`
+      : `Managed money positioning is largely neutral. Speculators lack a strong directional conviction, aligning with current consolidation trends.`
+  ) : "Waiting for live CFTC positioning data...";
 
-    const percentile =
-  positioningPercentile(cftcData);
-
-    const crowding =
-    crowdingScore(cftcData);
+  const positioningInterpretation = liveCftc?.positioningInterpretation || liveInterpretation;
 
   return (
     <div className="h-full w-full overflow-y-auto overflow-x-hidden pb-8">
@@ -39,7 +43,7 @@ export default function CFTCAnalytics() {
         </h2>
 
         <PositioningChart
-          data={cftcData}
+          data={effective}
         />
 
       </div>
@@ -50,7 +54,7 @@ export default function CFTCAnalytics() {
           Smart Money Signal
         </p>
 
-        <h2 className="text-5xl font-black mt-4 text-green-400">
+        <h2 className={`text-5xl font-black mt-4 ${signal.includes('Bearish') ? 'text-red-400' : signal.includes('Bullish') ? 'text-green-400' : 'text-gray-400'}`}>
           {signal}
         </h2>
 
@@ -62,7 +66,7 @@ export default function CFTCAnalytics() {
             </span>
 
             <span>
-              {net}
+          {net != null ? net : "N/A"}
             </span>
           </div>
 
@@ -84,7 +88,7 @@ export default function CFTCAnalytics() {
         </span>
 
         <span>
-            {percentile}%
+        {percentile != null ? `${percentile}%` : "N/A"}
         </span>
         </div>
 
@@ -107,7 +111,7 @@ export default function CFTCAnalytics() {
         </h3>
 
         <p className="text-5xl font-black mt-4 text-green-400">
-          515K
+          {latest.longs ?? "N/A"}K
         </p>
 
       </div>
@@ -119,7 +123,7 @@ export default function CFTCAnalytics() {
         </h3>
 
         <p className="text-5xl font-black mt-4 text-red-400">
-          150K
+          {latest.shorts ?? "N/A"}K
         </p>
 
       </div>
@@ -131,7 +135,7 @@ export default function CFTCAnalytics() {
         </h3>
 
         <p className="text-5xl font-black mt-4 text-cyan-400">
-          2.5M
+          {latest.oi ?? "N/A"}K
         </p>
 
       </div>
@@ -143,14 +147,7 @@ export default function CFTCAnalytics() {
         </h3>
 
         <p className="text-gray-400 leading-relaxed">
-
-          Managed money positioning
-          remains heavily net long while
-          open interest continues to rise.
-          This combination suggests
-          increasing speculative
-          participation and supports a
-          bullish medium-term outlook.
+          {positioningInterpretation}
 
         </p>
 

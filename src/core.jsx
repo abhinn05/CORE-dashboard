@@ -15,32 +15,36 @@ import Risk from "./pages/Risk";
 import PortfolioRisk from "./pages/PortfolioRisk";
 
 import { useState } from 'react';
+import { useMarket } from "./hooks";
+import { buildMarketStrip, resolveMarketMetric, formatPercentChange } from "./utils/marketUtils";
+import {
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  CartesianGrid
+} from "recharts";
 
 export default function OilEnergyDashboard() {
   const [authenticated, setAuthenticated] = useState(false);
   const [password, setPassword] = useState('');
 
-const correctPassword = 'Abhinn14';
+const correctPassword = import.meta.env.VITE_ACCESS_PASSWORD || 'Abhinn14';
 const [activeTab, setActiveTab] = useState('master');
 
-  const bottomMetrics = [
-    { name: 'DXY', value: '104.12', change: '-0.42%' },
-    { name: 'OVX', value: '36.8', change: '+3.1%' },
-    { name: 'Inventories', value: '-4.2M', change: 'Bullish' },
-    { name: 'Rig Count', value: '612', change: '+8' },
-    { name: 'OPEC', value: 'Cuts', change: 'Supportive' },
-  ];
+  const { data: liveMarket } = useMarket();
+  const effectiveMarket = liveMarket ?? {};
+  const marketStrip = buildMarketStrip(effectiveMarket);
+  const marketOverviewIds = ['wti', 'brent', 'heatingOil', 'dxy', 'ovx', 'spread'];
 
-
-
-  const [timeframe, setTimeframe] = useState('1D');
-
-  const chartData = {
-    '1D': [40, 55, 48, 70, 62, 80, 76, 92, 105, 95, 120, 138],
-    '1W': [60, 80, 70, 95, 110, 125, 140, 135, 150, 165, 180, 210],
-    '1M': [40, 50, 70, 90, 120, 110, 150, 180, 210, 240, 270, 300],
-    '3M': [30, 45, 60, 80, 110, 140, 170, 190, 220, 250, 290, 330],
-    '1Y': [20, 35, 50, 70, 95, 130, 170, 220, 260, 310, 360, 420],
+  const handleAuth = () => {
+    if (password === correctPassword) {
+      setAuthenticated(true);
+    } else {
+      alert('Incorrect Password');
+    }
   };
 
 
@@ -69,17 +73,16 @@ const [activeTab, setActiveTab] = useState('master');
               placeholder="Enter Access Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    handleAuth();
+                  }
+                }}
               className="w-full h-14 rounded-2xl bg-black/30 border border-white/[0.08] px-5 outline-none text-white"
             />
 
             <button
-              onClick={() => {
-                if (password === correctPassword) {
-                  setAuthenticated(true);
-                } else {
-                  alert('Incorrect Password');
-                }
-              }}
+              onClick={handleAuth}
               className="w-full h-14 rounded-2xl bg-cyan-400 text-black font-black mt-5 hover:opacity-90 transition-all duration-200"
             >
               Enter Dashboard
@@ -127,13 +130,12 @@ const [activeTab, setActiveTab] = useState('master');
         </header>
 
         <div className="h-[42px] border-b border-white/[0.05] flex items-center gap-6 px-4 text-sm overflow-x-auto whitespace-nowrap bg-[#05070d]">
-        <div className="text-green-400">WTI +1.84%</div>
-        <div className="text-green-400">Brent +1.22%</div>
-        <div className="text-red-400">DXY -0.42%</div>
-        <div className="text-cyan-400">OVX +3.1%</div>
-        <div className="text-green-400">Heating Oil +0.82%</div>
-        <div className="text-orange-400">WTI-Brent Spread 3.74</div>
-      </div>
+          {marketStrip.map((item) => (
+            <div key={item.id} className={item.color}>
+              {item.label} {item.value} {formatPercentChange(item.change)}
+            </div>
+          ))}
+        </div>
 
         {/* Main Grid */}
         <main className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden px-2 py-3 xl:px-3 xl:py-3">
@@ -180,71 +182,47 @@ const [activeTab, setActiveTab] = useState('master');
                   </div>
                 </div>
 
-                <div className="mt-8 h-[280px] rounded-[28px] bg-[#05070d] border border-white/[0.04] p-6 overflow-hidden relative">
-
-                  <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:60px_60px]" />
-
-                  <div className="absolute top-6 right-6 flex gap-5 text-xs uppercase tracking-[0.2em]">
+                <div className="mt-8 h-[280px] rounded-[28px] bg-[#05070d] border border-white/[0.04] p-6 relative">
+                  <div className="absolute top-6 right-6 flex gap-5 text-xs uppercase tracking-[0.2em] z-10">
                     <span className="text-cyan-400">WTI</span>
                     <span className="text-green-400">Brent</span>
                     <span className="text-orange-400">Heating Oil</span>
                   </div>
-
-                  <svg
-                    viewBox="0 0 1000 300"
-                    className="w-full h-full relative z-10"
-                    preserveAspectRatio="none"
-                  >
-                    <path
-                      d="M0 240 C120 220,240 170,360 180 C480 190,600 130,720 100 C840 70,920 40,1000 30"
-                      fill="none"
-                      stroke="#22d3ee"
-                      strokeWidth="4"
-                      strokeLinecap="round"
-                    />
-
-                    <path
-                      d="M0 260 C120 240,240 210,360 190 C480 160,600 140,720 120 C840 100,920 70,1000 60"
-                      fill="none"
-                      stroke="#4ade80"
-                      strokeWidth="4"
-                      strokeLinecap="round"
-                    />
-
-                    <path
-                      d="M0 280 C120 250,240 230,360 220 C480 210,600 190,720 170 C840 160,920 120,1000 100"
-                      fill="none"
-                      stroke="#fb923c"
-                      strokeWidth="4"
-                      strokeLinecap="round"
-                    />
-                  </svg>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={effectiveMarket.priceHistory}>
+                      <CartesianGrid stroke="#ffffff14" vertical={false} />
+                      <XAxis dataKey="name" hide />
+                      <YAxis hide domain={['auto', 'auto']} />
+                      <Tooltip contentStyle={{ backgroundColor: "#08101c", borderColor: "#ffffff14", borderRadius: "12px" }} />
+                      <Line type="monotone" dataKey="value" stroke="#22d3ee" strokeWidth={3} dot={false} name="WTI" />
+                      <Line type="monotone" dataKey="brent" stroke="#4ade80" strokeWidth={3} dot={false} name="Brent" />
+                      <Line type="monotone" dataKey="ho" stroke="#fb923c" strokeWidth={3} dot={false} name="Heating Oil" />
+                    </LineChart>
+                  </ResponsiveContainer>
                 </div>
 
                 <div className="grid grid-cols-3 gap-5 mt-10">
-                  {[
-                  'WTI',
-                  'Brent',
-                  'WTI-Brent Spread',
-                  'Heating Oil',
-                  'EU Carbon',
-                  'DXY',
-                ].map((item, index) => (
-                    <div
-                      key={index}
-                      className="rounded-[24px] bg-white/[0.03] border border-white/[0.04] p-6"
-                    >
-                      <p className="text-gray-500 text-sm uppercase tracking-[0.2em]">
-                        {item}
-                      </p>
+                  {marketOverviewIds.map((id) => {
+                    const metric = resolveMarketMetric(effectiveMarket, id);
+                    return (
+                      <div
+                        key={id}
+                        className="rounded-[24px] bg-white/[0.03] border border-white/[0.04] p-6"
+                      >
+                        <p className="text-gray-500 text-sm uppercase tracking-[0.2em]">
+                          {metric.label}
+                        </p>
 
-                      <h3 className="text-4xl font-bold mt-4">
-                        {70 + index * 4}.42
-                      </h3>
+                        <h3 className="text-4xl font-bold mt-4">
+                          {metric.value}
+                        </h3>
 
-                      <p className="text-green-400 mt-2 text-sm">+1.82%</p>
-                    </div>
-                  ))}
+                        <p className={`${metric.change?.startsWith('-') ? 'text-red-400' : 'text-green-400'} mt-2 text-sm`}>
+                          {formatPercentChange(metric.change) || '—'}
+                        </p>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
 
@@ -252,24 +230,20 @@ const [activeTab, setActiveTab] = useState('master');
                 <h3 className="text-2xl font-semibold">Market Movers</h3>
 
                 <div className="mt-6 space-y-4">
-                  {['OPEC Cuts', 'China Demand', 'Inventory Draw', 'Weak Dollar'].map((item, index) => (
+                  {(effectiveMarket.marketMovers || []).map((item, index) => (
                     <div
                       key={index}
                       className="p-5 rounded-[22px] bg-white/[0.03] border border-white/[0.04]"
                     >
-                      <p className="text-lg">{item}</p>
+                      <p className="text-lg">{item.title}</p>
                       <p className="text-sm text-gray-400 mt-2">
-                        {
-                          [
-                            'Supply Shock',
-                            'Demand Recovery',
-                            'Inventory Surprise',
-                            'Macro Tailwind',
-                          ][index]
-                        }
+                        {item.desc}
                       </p>
                     </div>
                   ))}
+                  {(!effectiveMarket.marketMovers || effectiveMarket.marketMovers.length === 0) && (
+                    <p className="text-sm text-gray-500">Waiting for live market movers...</p>
+                  )}
                 </div>
 
                 <div className="mt-6 grid grid-cols-2 gap-4">
@@ -279,11 +253,11 @@ const [activeTab, setActiveTab] = useState('master');
                     </p>
 
                     <h3 className="text-3xl font-bold mt-4">
-                      2.4M
+                      {effectiveMarket.marketStats?.volume?.value ?? "N/A"}
                     </h3>
 
-                    <p className="text-green-400 mt-2 text-sm">
-                      +12.4%
+                    <p className={`${effectiveMarket.marketStats?.volume?.change?.startsWith('-') ? 'text-red-400' : 'text-green-400'} mt-2 text-sm`}>
+                      {effectiveMarket.marketStats?.volume?.change ?? ""}
                     </p>
                   </div>
 
@@ -293,11 +267,11 @@ const [activeTab, setActiveTab] = useState('master');
                     </p>
 
                     <h3 className="text-3xl font-bold mt-4">
-                      1.8M
+                      {effectiveMarket.marketStats?.openInterest?.value ?? "N/A"}
                     </h3>
 
                     <p className="text-cyan-400 mt-2 text-sm">
-                      Active Futures
+                      {effectiveMarket.marketStats?.openInterest?.desc ?? ""}
                     </p>
                   </div>
                 </div>
