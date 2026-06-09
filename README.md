@@ -60,7 +60,6 @@ Follow these steps to set up and run the CORE dashboard on your local developmen
    ```env
    VITE_ACCESS_PASSWORD=your_secure_password
    ```
-   *(If not provided, the default password is `Abhinn14`)*
 
 4. Start the development server:
    ```bash
