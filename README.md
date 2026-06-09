@@ -2,6 +2,8 @@
 
 CORE (Crude Oil Risk Engine) is a comprehensive, confidential Oil & Energy Intelligence Dashboard. It provides advanced analytics, market overviews, and risk assessment tools for global energy markets, tailored for commodity structure overview and intelligence.
 
+**🌍 Live Website:** [https://core-dashboard-ff.vercel.app/](https://core-dashboard-ff.vercel.app/)
+
 ## Features
 
 - **Master Dashboard**: High-level overview of the energy markets.
@@ -29,18 +31,20 @@ CORE (Crude Oil Risk Engine) is a comprehensive, confidential Oil & Energy Intel
 - **Data Fetching**: [TanStack React Query](https://tanstack.com/query/latest)
 - **Charting**: [Recharts](https://recharts.org/)
 
-## Getting Started
+## 💻 Guide to Run Locally
+
+Follow these steps to set up and run the CORE dashboard on your local development machine.
 
 ### Prerequisites
 
 - Node.js (v16 or higher recommended)
 - npm, yarn, or pnpm
 
-### Installation
+### Step-by-Step Installation
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/abhinn05/CORE-dashboard
+   git clone <repository-url>
    cd core-dashboard
    ```
 
@@ -65,7 +69,7 @@ CORE (Crude Oil Risk Engine) is a comprehensive, confidential Oil & Energy Intel
    yarn dev
    ```
 
-5. Open your browser and navigate to the local URL provided by Vite (usually `http://localhost:5173`).
+5. **View the App:** Open your browser and navigate to the local URL provided by Vite (usually http://localhost:5173).
 
 ## Build for Production
 
