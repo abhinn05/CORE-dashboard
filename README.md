@@ -40,7 +40,7 @@ CORE (Crude Oil Risk Engine) is a comprehensive, confidential Oil & Energy Intel
 
 1. Clone the repository:
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/abhinn05/CORE-dashboard
    cd core-dashboard
    ```
 
