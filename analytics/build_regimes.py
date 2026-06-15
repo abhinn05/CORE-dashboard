@@ -5,57 +5,83 @@ from pathlib import Path
 INPUT = Path("data/processed/master_features.parquet")
 OUTPUT = Path("data/processed/regime_database.parquet")
 
-print("Loading features...")
+print("Loading master features...")
+
 df = pd.read_parquet(INPUT)
 
-print("Creating volatility regimes...")
+print("Initial shape:", df.shape)
 
-# Volatility regimes
-vol_q1 = df["CL_VOL20"].quantile(0.33)
-vol_q2 = df["CL_VOL20"].quantile(0.67)
+
+# ==========================
+# VOLATILITY REGIME
+# ==========================
+
+print("\nCreating volatility regimes...")
+
+vol = df["CL_VOL20"].dropna()
+
+low = vol.quantile(0.33)
+high = vol.quantile(0.67)
 
 df["VOL_REGIME"] = np.select(
     [
-        df["CL_VOL20"] <= vol_q1,
-        df["CL_VOL20"] <= vol_q2,
+        df["CL_VOL20"] <= low,
+        df["CL_VOL20"] <= high,
     ],
     [
-        "LOW",
-        "MEDIUM",
+        "LOW_VOL",
+        "MED_VOL",
     ],
-    default="HIGH",
+    default="HIGH_VOL",
 )
+
+
+# ==========================
+# CURVE REGIME
+# ==========================
 
 print("Creating curve regimes...")
 
-# Curve regime
 df["CURVE_REGIME"] = np.where(
     df["CL_M1M6"] > 0,
     "BACKWARDATION",
     "CONTANGO",
 )
 
+
+# ==========================
+# PRODUCT REGIME
+# ==========================
+
 print("Creating product regimes...")
 
-# Product strength
-product_med = df["LGO_LCO_DIFF"].median()
+product_median = df["LGO_LCO_DIFF"].median()
 
 df["PRODUCT_REGIME"] = np.where(
-    df["LGO_LCO_DIFF"] > product_med,
+    df["LGO_LCO_DIFF"] >= product_median,
     "STRONG_PRODUCTS",
     "WEAK_PRODUCTS",
 )
 
+
+# ==========================
+# WTI-BRENT REGIME
+# ==========================
+
 print("Creating WTI-Brent regimes...")
 
-# WTI-Brent regime
-wb_med = df["WB_C1"].median()
+wb_median = df["WB_C1"].median()
 
 df["WB_REGIME"] = np.where(
-    df["WB_C1"] > wb_med,
-    "TIGHT",
-    "LOOSE",
+    df["WB_C1"] >= wb_median,
+    "TIGHT_WB",
+    "LOOSE_WB",
 )
+
+
+# ==========================
+# FINAL REGIME LABEL
+# ==========================
 
 print("Combining regimes...")
 
@@ -69,13 +95,30 @@ df["REGIME"] = (
     + df["WB_REGIME"]
 )
 
-print("\nRegime counts:")
 
-print(
+# ==========================
+# REGIME STATS
+# ==========================
+
+print("\nRegime Counts:")
+
+counts = (
     df["REGIME"]
     .value_counts()
     .sort_values(ascending=False)
 )
+
+print(counts)
+
+
+print("\nTop 10 Regimes:")
+
+print(counts.head(10))
+
+
+# ==========================
+# SAVE OUTPUTS
+# ==========================
 
 df.to_parquet(OUTPUT)
 
@@ -83,7 +126,17 @@ df.to_csv(
     "data/processed/regime_database.csv"
 )
 
-print("\nSaved:")
-print(OUTPUT)
+counts.to_csv(
+    "data/processed/regime_counts.csv"
+)
 
-print("\nShape:", df.shape)
+
+print("\nSaved:")
+
+print("regime_database.parquet")
+print("regime_database.csv")
+print("regime_counts.csv")
+
+print("\nFinal shape:")
+
+print(df.shape)

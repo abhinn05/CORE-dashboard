@@ -135,20 +135,34 @@ print("Generating volatility...")
 for mkt in markets:
 
     try:
-        ret = master[f"{mkt}_C1"].pct_change()
+
+        price = master[f"{mkt}_C1"].dropna()
+
+        ret = price.pct_change()
+
+        vol20 = (
+            ret.rolling(20)
+            .std()
+            * np.sqrt(252)
+        )
+
+        vol60 = (
+            ret.rolling(60)
+            .std()
+            * np.sqrt(252)
+        )
 
         master[f"{mkt}_VOL20"] = (
-            ret.rolling(20).std()
-            * np.sqrt(252)
+            vol20.reindex(master.index)
         )
 
         master[f"{mkt}_VOL60"] = (
-            ret.rolling(60).std()
-            * np.sqrt(252)
+            vol60.reindex(master.index)
         )
 
-    except:
-        pass
+    except Exception as e:
+
+        print(f"{mkt} failed:", e)
 
 
 print("Generating cross-market features...")
@@ -187,6 +201,12 @@ except:
 
 
 master.sort_index(inplace=True)
+
+# Keep only the common historical window
+master = master.loc[
+    (master.index >= "2021-01-01")
+    & (master.index <= "2024-06-30")
+]
 
 master.to_parquet(
     OUT_DIR / "master_features.parquet"
