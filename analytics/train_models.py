@@ -52,11 +52,17 @@ models = {
 }
 
 
+MIN_REGIME_OBSERVATIONS = 50
+
 for regime in df["REGIME"].unique():
 
     regime_df = df[df["REGIME"] == regime]
 
-    if len(regime_df) < 15:
+    if len(regime_df) < MIN_REGIME_OBSERVATIONS:
+        print(
+            f"Skipping {regime}: "
+            f"{len(regime_df)} observations"
+        )
         continue
 
     print(f"\n{regime}: {len(regime_df)} observations")
@@ -71,7 +77,13 @@ for regime in df["REGIME"].unique():
             f"  {task['target']} usable rows = {len(data)}"
         )
 
-        if len(data) < 15:
+        if len(data) < MIN_REGIME_OBSERVATIONS:
+
+            print(
+                f"    Not enough rows "
+                f"for {task['target']}"
+            )
+
             continue
 
         X = data[task["features"]]
@@ -88,6 +100,8 @@ for regime in df["REGIME"].unique():
         y_train = y.iloc[:split]
         y_test = y.iloc[split:]
 
+        best_result = None
+
         for model_name, model in models.items():
 
             model.fit(X_train, y_train)
@@ -95,6 +109,7 @@ for regime in df["REGIME"].unique():
             pred = model.predict(X_test)
 
             r2 = r2_score(y_test, pred)
+
             mae = mean_absolute_error(y_test, pred)
 
             print(
@@ -103,26 +118,43 @@ for regime in df["REGIME"].unique():
                 f"R²={r2:.4f}"
             )
 
-            results.append(
-                {
-                    "regime": regime,
-                    "target": task["target"],
-                    "model": model_name,
-                    "observations": len(data),
-                    "r2": round(float(r2), 4),
-                    "mae": round(float(mae), 4),
-                    "coefficients": dict(
-                        zip(
-                            task["features"],
-                            [round(float(c), 4) for c in model.coef_],
-                        )
-                    ),
-                    "intercept": round(
-                        float(model.intercept_),
-                        4,
-                    ),
-                }
-            )
+            MIN_R2 = 0.20
+
+            if r2 < MIN_R2:
+                continue
+
+            candidate = {
+                "regime": regime,
+                "target": task["target"],
+                "model": model_name,
+                "observations": len(data),
+                "r2": round(float(r2), 4),
+                "mae": round(float(mae), 4),
+                "coefficients": dict(
+                    zip(
+                        task["features"],
+                        [
+                            round(float(c), 4)
+                            for c in model.coef_
+                        ],
+                    )
+                ),
+                "intercept": round(
+                    float(model.intercept_),
+                    4,
+                ),
+            }
+
+            if (
+                best_result is None
+                or candidate["r2"] > best_result["r2"]
+            ):
+                best_result = candidate
+
+
+        if best_result is not None:
+
+            results.append(best_result)
 
 
 results = sorted(

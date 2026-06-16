@@ -4,12 +4,29 @@ import json
 from pathlib import Path
 from sklearn.linear_model import LinearRegression, Ridge, Lasso
 
+MODEL_INPUT = Path(
+    "data/processed/regression_results.json"
+)
+
+
 INPUT = Path("data/processed/regime_database.parquet")
 OUTPUT = Path("data/processed/opportunities.json")
 
 print("Loading regime database...")
 
 df = pd.read_parquet(INPUT)
+
+with open(MODEL_INPUT) as f:
+    approved_models = json.load(f)
+
+approved_lookup = {
+    (m["regime"], m["target"]): m
+    for m in approved_models
+}
+
+print(
+    f"Loaded {len(approved_models)} approved models"
+)
 
 tasks = [
     {
@@ -39,11 +56,7 @@ tasks = [
     },
 ]
 
-models = {
-    "Linear": LinearRegression(),
-    "Ridge": Ridge(alpha=1.0),
-    "Lasso": Lasso(alpha=0.001),
-}
+
 
 opportunities = []
 
@@ -75,29 +88,19 @@ for task in tasks:
 
     current_regime = current_row["REGIME"]
 
-    regime_df = None
+    used_regime = current_regime
 
-    used_regime = None
+    regime_df = (
+        df[
+            df["REGIME"] == current_regime
+        ][features + [target]]
+        .dropna()
+    )
 
-    for regime in reversed(df["REGIME"].tolist()):
-
-        candidate = df[df["REGIME"] == regime]
-
-        candidate = candidate[
-            features + [target]
-        ].dropna()
-
-        if len(candidate) >= 30:
-
-            regime_df = candidate
-
-            used_regime = regime
-
-            break
-
-    if regime_df is None:
+    if len(regime_df) < 30:
 
         continue
+
 
     data = regime_df
 
@@ -114,37 +117,26 @@ for task in tasks:
     X_train = train[features]
     y_train = train[target]
 
-    best_model = None
-    best_r2 = -999
+    key = (used_regime, target)
 
-    for model_name, model in models.items():
+    if key not in approved_lookup:
 
-        model.fit(X_train, y_train)
-
-        pred = model.predict(
-            data[features]
+        print(
+            f"No approved model for "
+            f"{used_regime} | {target}"
         )
 
-        r2 = (
-            1
-            - np.sum(
-                (data[target] - pred) ** 2
-            )
-            / np.sum(
-                (
-                    data[target]
-                    - data[target].mean()
-                )
-                ** 2
-            )
-        )
+        continue
 
-        if r2 > best_r2:
-            best_r2 = r2
-            best_model = (
-                model_name,
-                model,
-            )
+    model_info = approved_lookup[key]
+
+    best_r2 = model_info["r2"]
+
+    coefficients = model_info["coefficients"]
+
+    intercept = model_info["intercept"]
+
+    model_name = model_info["model"]
 
     print(
     f"{target} | "
@@ -155,24 +147,31 @@ for task in tasks:
     if best_r2 < 0:
         continue
 
-    model_name, model = best_model
 
     actual = current_row[target]
 
-    X_current = pd.DataFrame(
-        [current_row[features]],
-        columns=features,
-    )
 
-    expected = model.predict(
-        X_current
-    )[0]
+    expected = intercept
+
+    for feature, coef in coefficients.items():
+
+        expected += (
+            current_row[feature]
+            * coef
+        )
+
+    predictions = (
+        intercept
+        + data[list(coefficients.keys())]
+        .mul(
+            pd.Series(coefficients)
+        )
+        .sum(axis=1)
+    )
 
     residuals = (
         data[target]
-        - model.predict(
-            data[features]
-        )
+        - predictions
     )
 
     resid_std = residuals.std()

@@ -4,7 +4,15 @@ dotenv.config();
 /* global process */
 import express from 'express';
 import cors from 'cors';
+
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
 import { formatMarketQuote, computeSpreadValue, formatPercentChange } from '../src/utils/marketUtils.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 app.use(cors());
@@ -1304,9 +1312,123 @@ app.get('/api/curve', async (req, res) => {
   return proxyFallback(req, res, { envUrl: 'API_CURVE_URL' });
 });
 
+
+app.get('/api/opportunities', (req, res) => {
+  try {
+    const filePath = path.join(
+      __dirname,
+      '../analytics/data/processed/opportunities.json'
+    );
+
+    const data = JSON.parse(
+      fs.readFileSync(filePath, 'utf8')
+    );
+
+    res.json({
+      data,
+      ts: Date.now(),
+      source: 'analytics',
+    });
+  } catch (err) {
+    console.error(err);
+
+    res.status(500).json({
+      error: 'Unable to load opportunities',
+    });
+  }
+});
+
+
+app.get('/api/current-regime', (req, res) => {
+  try {
+    const csvPath = path.join(
+      __dirname,
+      '../analytics/data/processed/regime_database.csv'
+    );
+
+    const lines = fs
+      .readFileSync(csvPath, 'utf8')
+      .trim()
+      .split('\n');
+
+    const headers = lines[0].split(',');
+
+    const latest = lines[lines.length - 1].split(',');
+
+    const regimeIndex = headers.indexOf('REGIME');
+
+    res.json({
+      date: latest[0],
+      regime: latest[regimeIndex],
+      ts: Date.now(),
+      source: 'analytics',
+    });
+
+  } catch (err) {
+    console.error(err);
+
+    res.status(500).json({
+      error: 'Unable to load regime',
+    });
+  }
+});
+
+
+app.get('/api/model-results', (req, res) => {
+  try {
+    const filePath = path.join(
+      __dirname,
+      '../analytics/data/processed/regression_results.json'
+    );
+
+    const data = JSON.parse(
+      fs.readFileSync(filePath, 'utf8')
+    );
+
+    res.json({
+      data,
+      ts: Date.now(),
+      source: 'analytics',
+    });
+  } catch (err) {
+    console.error(err);
+
+    res.status(500).json({
+      error: 'Unable to load model results',
+    });
+  }
+});
+
+
+app.get('/api/regime-counts', (req, res) => {
+  try {
+    const filePath = path.join(
+      __dirname,
+      '../analytics/data/processed/regime_counts.csv'
+    );
+
+    const data = fs.readFileSync(
+      filePath,
+      'utf8'
+    );
+
+    res.send(data);
+
+  } catch (err) {
+    console.error(err);
+
+    res.status(500).json({
+      error: 'Unable to load regime counts',
+    });
+  }
+});
+
+
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', ts: Date.now() });
 });
+
+
 
 const port = process.env.PORT || 4010;
 app.listen(port, () => console.log(`API server running on http://localhost:${port}`));
