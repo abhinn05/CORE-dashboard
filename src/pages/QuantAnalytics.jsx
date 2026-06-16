@@ -1,4 +1,14 @@
 import {
+  useCoreAnalytics,
+} from "../hooks/useCoreAnalytics";
+
+import RegimeCard from "../components/quant/RegimeCard";
+
+import OpportunityCard from "../components/quant/OpportunityCard";
+
+import ModelCard from "../components/quant/ModelCard";
+
+import {
   ResponsiveContainer,
   LineChart,
   Line,
@@ -13,6 +23,14 @@ import {
 
 export default function QuantAnalytics() {
   const { data: live } = useQuant();
+  const {
+    regime,
+    models,
+    opportunities,
+  } = useCoreAnalytics();
+  console.log("PAGE REGIME:", regime);
+  console.log("PAGE MODELS:", models);
+  console.log("PAGE OPPS:", opportunities);
   const effective = live ?? {
     betaSeries: [],
     momentumSignals: [],
@@ -95,26 +113,26 @@ export default function QuantAnalytics() {
             <div className="flex gap-2 mt-8">
 
               {effective.volatilityRegimes.map(
-                (regime) => (
-                  <div
-                    key={regime}
-                    className={`flex-1 h-5 rounded-full ${getVolatilityColor(
-                      regime
-                    )}`}
-                  />
+                (regime, index) => (
+                    <div
+                        key={`${regime}-${index}`}
+                        className={`flex-1 h-5 rounded-full ${getVolatilityColor(
+                            regime
+                        )}`}
+                    />
                 )
-              )}
+            )}
 
             </div>
 
             <div className="grid grid-cols-4 gap-2 mt-4 text-[10px] text-center text-gray-400">
 
                 {effective.volatilityRegimes.map(
-                (regime) => (
-                  <div key={regime}>
-                    {regime}
-                  </div>
-                )
+                  (regime, index) => (
+                      <div key={`${regime}-${index}`}>
+                          {regime}
+                      </div>
+                  )
               )}
 
             </div>
@@ -199,13 +217,13 @@ export default function QuantAnalytics() {
           Signal Strength
         </h3>
 
-        <div className="mt-8 space-y-6">
+        <div className="mt-8 space-y-8">
 
           {effective.signalStrengths.map(
             (item) => (
               <div key={item.name}>
 
-                <div className="flex justify-between mb-3">
+                <div className="flex justify-between mb-1">
                   <span>{item.name}</span>
                   <span className="text-cyan-400">
                     {String(item.value).includes("%") ? item.value : `${item.value}%`}
@@ -246,8 +264,34 @@ export default function QuantAnalytics() {
             )
           )}
         </div>
-      </div>
-      </div>
+            </div>
+
     </div>
+
+   <div className="mt-6 grid grid-cols-1 xl:grid-cols-12 gap-5">
+
+      <div className="xl:col-span-3 space-y-5">
+
+        <RegimeCard
+          regime={regime}
+        />
+
+        <OpportunityCard
+          opportunities={opportunities}
+        />
+
+      </div>
+
+      <div className="xl:col-span-9">
+
+        <ModelCard
+          models={models}
+        />
+
+      </div>
+
+    </div>
+
+  </div>
   );
 }
