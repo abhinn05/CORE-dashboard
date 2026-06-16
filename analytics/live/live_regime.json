@@ -1,0 +1,14 @@
+{
+  "timestamp": "2026-06-16T07:42:01.700685+00:00",
+  "regime": "HIGH_VOL_LOOSE_WB_DRAW",
+  "drivers": {
+    "volatility": "HIGH_VOL",
+    "wb": "LOOSE_WB",
+    "inventory": "DRAW"
+  },
+  "values": {
+    "CL_VOL20": 47.75,
+    "WB_C1": -3.6,
+    "INVENTORY_DRAW": -7.2
+  }
+}

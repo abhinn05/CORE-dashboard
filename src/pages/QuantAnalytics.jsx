@@ -5,6 +5,9 @@ import {
 import { useRollingModels }
   from "../hooks/useRollingModels";
 
+import { useSignalLog }
+  from "../hooks/useSignalLog";
+
 import RegimeCard from "../components/quant/RegimeCard";
 
 import OpportunityCard from "../components/quant/OpportunityCard";
@@ -19,6 +22,10 @@ import RegimeStatsCard
 
 import RegimeDistributionCard
   from "../components/quant/RegimeDistributionCard";
+
+import SignalLogCard
+  from "../components/quant/SignalLogCard";
+
 
 import {
   ResponsiveContainer,
@@ -46,6 +53,16 @@ export default function QuantAnalytics() {
    const {
     data: rollingModels = [],
   } = useRollingModels();
+
+  const {
+
+      signals,
+
+      loading,
+
+      error,
+
+  } = useSignalLog();
 
   console.log("PAGE REGIME:", regime);
   console.log("PAGE MODELS:", models);
@@ -301,6 +318,10 @@ export default function QuantAnalytics() {
 
           <OpportunityCard
             opportunities={opportunities}
+          />
+
+          <SignalLogCard
+            signals={signals}
           />
 
         </div>

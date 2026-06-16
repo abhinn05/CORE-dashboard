@@ -7,9 +7,21 @@ from sklearn.linear_model import LinearRegression, Ridge, Lasso
 from sklearn.metrics import r2_score, mean_absolute_error
 from sklearn.feature_selection import RFECV
 
-INPUT = Path("data/processed/regime_database.parquet")
-OUTPUT = Path("data/processed/regression_results.json")
+BASE_DIR = Path(__file__).resolve().parent
 
+INPUT = (
+    BASE_DIR
+    / "data"
+    / "processed"
+    / "regime_database.parquet"
+)
+
+OUTPUT = (
+    BASE_DIR
+    / "data"
+    / "processed"
+    / "regression_results.json"
+)
 print("Loading regime database...")
 
 df = pd.read_parquet(INPUT)
@@ -53,7 +65,9 @@ models = {
 }
 
 
-MIN_REGIME_OBSERVATIONS = 50
+MIN_REGIME_OBSERVATIONS = 30
+MIN_R2 = 0.20
+MIN_TEST_OBSERVATIONS = 5
 
 for regime in df["REGIME"].unique():
 
@@ -92,8 +106,11 @@ for regime in df["REGIME"].unique():
 
         split = max(int(len(data) * 0.8), 10)
 
-        if len(data) - split < 3:
+        if len(data) - split < MIN_TEST_OBSERVATIONS:
             continue
+
+        
+        
 
         X_train = X.iloc[:split]
         X_test = X.iloc[split:]
@@ -152,7 +169,7 @@ for regime in df["REGIME"].unique():
                 f"R²={r2:.4f}"
             )
 
-            MIN_R2 = 0.20
+            
 
             if r2 < MIN_R2:
                 continue

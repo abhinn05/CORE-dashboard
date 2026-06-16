@@ -4,6 +4,8 @@ dotenv.config();
 /* global process */
 import express from 'express';
 import cors from 'cors';
+import cron from "node-cron";
+import { exec } from "child_process";
 
 import fs from 'fs';
 import path from 'path';
@@ -15,7 +17,17 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-app.use(cors());
+app.use(
+
+    cors({
+
+        origin: true,
+
+        credentials: true,
+
+    })
+
+);
 app.use(express.json());
 
 const DEFAULT_YAHOO_MARKET_SYMBOLS = ['CL=F', 'BZ=F', 'DX-Y.NYB', '^OVX', 'HO=F'];
@@ -1212,6 +1224,36 @@ app.get('/api/market', async (req, res) => {
       brent: brentMap.has(point.ts) ? round(brentMap.get(point.ts), 2) : null,
       ho: hoMap.has(point.ts) ? round(hoMap.get(point.ts), 2) : null,
     })) : [];
+
+    data.analyticsInputs = {
+
+        WB_C1:
+            Number(data.spread?.value),
+
+        CL_VOL20:
+            Number(data.ovx?.value),
+
+        HO_CL_DIFF:
+            (
+                Number(data.heatingOil?.value)
+                -
+                Number(data.wti?.value)
+            ),
+
+        INVENTORY_DRAW:
+            data.inventory?.draw,
+
+        WTI_PRICE:
+            Number(data.wti?.value),
+
+        BRENT_PRICE:
+            Number(data.brent?.value),
+
+        DXY:
+            Number(data.dxy?.value),
+
+    };
+
     return res.json({ data, ts: Date.now(), source: 'live-backend' });
   } catch (err) {
     console.error('market api error', err);
@@ -1494,11 +1536,6 @@ app.get(
   }
 );
 
-
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', ts: Date.now() });
-});
-
 app.get(
   "/api/regime-stats",
   (_, res) => {
@@ -1575,6 +1612,88 @@ app.get(
 );
 
 
+app.get(
+
+    "/api/signal-log",
+
+    (req, res) => {
+
+        const file = path.join(
+
+            process.cwd(),
+
+            "analytics",
+
+            "live",
+
+            "signal_log.csv"
+
+        );
+
+        if (!fs.existsSync(file)) {
+
+            return res.send("");
+
+        }
+
+        res.send(
+
+            fs.readFileSync(
+
+                file,
+
+                "utf8"
+
+            )
+
+        );
+
+    }
+
+);
+
+cron.schedule("* * * * *", () => {
+
+    console.log(
+        "Updating live analytics engine..."
+    );
+
+    exec(
+
+        `
+        python analytics/scripts/fetch_market_snapshot.py &&
+        python analytics/scripts/generate_live_features.py &&
+        python analytics/scripts/generate_live_regime.py &&
+        python analytics/scripts/generate_live_opportunities.py &&
+        python analytics/scripts/update_signal_performance.py
+        `,
+
+        (
+            error,
+            stdout,
+            stderr
+        ) => {
+
+            if (error) {
+
+                console.error(
+                    stderr
+                );
+
+                return;
+            }
+
+            console.log(
+                stdout
+            );
+        }
+    );
+});
+
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', ts: Date.now() });
+});
 
 const port = process.env.PORT || 4010;
 app.listen(port, () => console.log(`API server running on http://localhost:${port}`));
+

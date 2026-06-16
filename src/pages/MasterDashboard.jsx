@@ -15,6 +15,7 @@ import SectionHeader from "../components/SectionHeader";
 import DashboardCard from "../components/DashboardCard";
 import AlertCenter from "../components/AlertCenter";
 import TradeRecommendation from "../components/TradeRecommendation";
+import SignalLogCard from "../components/quant/SignalLogCard";
 
 export default function MasterDashboard() {
   const { data: liveMarket } = useMarket();
@@ -135,6 +136,9 @@ export default function MasterDashboard() {
         </div>
 
         <div className="space-y-5">
+          <SignalLogCard
+            variant="compact"
+          />
           <AlertCenter alerts={alerts} />
         </div>
       </div>

@@ -1,0 +1,486 @@
+{
+  "wti": {
+    "id": "wti",
+    "label": "WTI",
+    "value": "78.7",
+    "change": "-2.54%",
+    "trend": "Bearish",
+    "severity": "High"
+  },
+  "brent": {
+    "id": "brent",
+    "label": "Brent",
+    "value": "82.3",
+    "change": "-1.05%",
+    "trend": "Bearish",
+    "severity": "Medium"
+  },
+  "dxy": {
+    "id": "dxy",
+    "label": "DXY",
+    "value": "99.672",
+    "change": "+0.04%",
+    "trend": "Bullish",
+    "severity": "Low"
+  },
+  "ovx": {
+    "id": "ovx",
+    "label": "OVX",
+    "value": "47.75",
+    "change": "-15.19%",
+    "trend": "Bearish",
+    "severity": "High",
+    "status": "High"
+  },
+  "heatingOil": {
+    "id": "heatingOil",
+    "label": "Heating Oil",
+    "value": "3.1905",
+    "change": "-1.09%",
+    "trend": "Bearish",
+    "severity": "Medium"
+  },
+  "spread": {
+    "id": "spread",
+    "label": "WTI-Brent Spread",
+    "value": "-3.6",
+    "change": "-4.37%",
+    "trend": "Brent Premium",
+    "severity": "High"
+  },
+  "kpis": [
+    {
+      "id": "wti",
+      "label": "WTI",
+      "value": "78.7",
+      "change": "-2.54%",
+      "trend": "Bearish",
+      "severity": "High"
+    },
+    {
+      "id": "brent",
+      "label": "Brent",
+      "value": "82.3",
+      "change": "-1.05%",
+      "trend": "Bearish",
+      "severity": "Medium"
+    },
+    {
+      "id": "dxy",
+      "label": "DXY",
+      "value": "99.672",
+      "change": "+0.04%",
+      "trend": "Bullish",
+      "severity": "Low"
+    },
+    {
+      "id": "ovx",
+      "label": "OVX",
+      "value": "47.75",
+      "change": "-15.19%",
+      "trend": "Bearish",
+      "severity": "High",
+      "status": "High"
+    },
+    {
+      "id": "heatingOil",
+      "label": "Heating Oil",
+      "value": "3.1905",
+      "change": "-1.09%",
+      "trend": "Bearish",
+      "severity": "Medium"
+    },
+    {
+      "id": "spread",
+      "label": "WTI-Brent Spread",
+      "value": "-3.6",
+      "change": "-4.37%",
+      "trend": "Brent Premium",
+      "severity": "High"
+    }
+  ],
+  "alertRules": [
+    {
+      "id": "wti-alert",
+      "title": "WTI Price Alert",
+      "value": 78.7,
+      "severity": "Medium",
+      "status": "Approaching upper resistance",
+      "message": "Approaching upper resistance",
+      "description": "Approaching upper resistance",
+      "timestamp": "Live"
+    },
+    {
+      "id": "ovx-alert",
+      "title": "OVX Volatility Spike",
+      "value": 47.75,
+      "severity": "High",
+      "status": "Energy volatility is elevated",
+      "message": "Energy volatility is elevated",
+      "description": "Energy volatility is elevated",
+      "timestamp": "Live"
+    },
+    {
+      "id": "inv-alert",
+      "title": "Inventory Draw",
+      "value": -7.2,
+      "severity": "High",
+      "status": "Commercial crude stocks drew 7.2M bbl",
+      "message": "Commercial crude stocks drew 7.2M bbl",
+      "description": "Commercial crude stocks drew 7.2M bbl",
+      "timestamp": "Live"
+    }
+  ],
+  "priceHistory": [
+    {
+      "t": "07:09 AM",
+      "name": "07:09 AM",
+      "value": 80.29,
+      "brent": 82.63,
+      "ho": 3.2
+    },
+    {
+      "t": "07:10 AM",
+      "name": "07:10 AM",
+      "value": 80.24,
+      "brent": 82.58,
+      "ho": 0
+    },
+    {
+      "t": "07:11 AM",
+      "name": "07:11 AM",
+      "value": 80.2,
+      "brent": 82.51,
+      "ho": 3.2
+    },
+    {
+      "t": "07:12 AM",
+      "name": "07:12 AM",
+      "value": 80.12,
+      "brent": 82.43,
+      "ho": 3.2
+    },
+    {
+      "t": "07:13 AM",
+      "name": "07:13 AM",
+      "value": 80.15,
+      "brent": 82.43,
+      "ho": 3.2
+    },
+    {
+      "t": "07:14 AM",
+      "name": "07:14 AM",
+      "value": 80.17,
+      "brent": 82.42,
+      "ho": 3.2
+    },
+    {
+      "t": "07:15 AM",
+      "name": "07:15 AM",
+      "value": 80.23,
+      "brent": 82.51,
+      "ho": 3.2
+    },
+    {
+      "t": "07:16 AM",
+      "name": "07:16 AM",
+      "value": 80.23,
+      "brent": 82.53,
+      "ho": 3.2
+    },
+    {
+      "t": "07:17 AM",
+      "name": "07:17 AM",
+      "value": 80.17,
+      "brent": 82.42,
+      "ho": 3.2
+    },
+    {
+      "t": "07:18 AM",
+      "name": "07:18 AM",
+      "value": 80.15,
+      "brent": 82.43,
+      "ho": 3.2
+    },
+    {
+      "t": "07:19 AM",
+      "name": "07:19 AM",
+      "value": 80.16,
+      "brent": 82.44,
+      "ho": 3.19
+    },
+    {
+      "t": "07:20 AM",
+      "name": "07:20 AM",
+      "value": 80.13,
+      "brent": 82.44,
+      "ho": 3.2
+    },
+    {
+      "t": "07:21 AM",
+      "name": "07:21 AM",
+      "value": 80.03,
+      "brent": 82.29,
+      "ho": 3.19
+    },
+    {
+      "t": "07:22 AM",
+      "name": "07:22 AM",
+      "value": 80.08,
+      "brent": 82.36,
+      "ho": 3.19
+    },
+    {
+      "t": "07:23 AM",
+      "name": "07:23 AM",
+      "value": 80.07,
+      "brent": 82.31,
+      "ho": 3.19
+    },
+    {
+      "t": "07:24 AM",
+      "name": "07:24 AM",
+      "value": 80.04,
+      "brent": 82.31,
+      "ho": 3.19
+    },
+    {
+      "t": "07:25 AM",
+      "name": "07:25 AM",
+      "value": 80.1,
+      "brent": 82.39,
+      "ho": 3.19
+    },
+    {
+      "t": "07:26 AM",
+      "name": "07:26 AM",
+      "value": 80.12,
+      "brent": 82.4,
+      "ho": 3.19
+    },
+    {
+      "t": "07:27 AM",
+      "name": "07:27 AM",
+      "value": 80.09,
+      "brent": 82.39,
+      "ho": 3.19
+    },
+    {
+      "t": "07:28 AM",
+      "name": "07:28 AM",
+      "value": 80.02,
+      "brent": 82.33,
+      "ho": 3.19
+    },
+    {
+      "t": "07:29 AM",
+      "name": "07:29 AM",
+      "value": 79.99,
+      "brent": 82.29,
+      "ho": 3.19
+    },
+    {
+      "t": "07:30 AM",
+      "name": "07:30 AM",
+      "value": 79.99,
+      "brent": 82.25,
+      "ho": 3.19
+    },
+    {
+      "t": "07:31 AM",
+      "name": "07:31 AM",
+      "value": 79.98,
+      "brent": 82.3,
+      "ho": 3.19
+    },
+    {
+      "t": "07:31 AM",
+      "name": "07:31 AM",
+      "value": 78.7,
+      "brent": null,
+      "ho": null
+    }
+  ],
+  "inventory": {
+    "value": "426.5M bbl",
+    "detail": "Live draw of -7.2M vs expected 0.1M.",
+    "momentum": "Tightening",
+    "draw": -7.2
+  },
+  "cftc": {
+    "longs": 6,
+    "shorts": 33,
+    "oi": 818,
+    "net": -27,
+    "sentiment": "Bearish",
+    "value": "-27k net",
+    "detail": "Managed money net position is moderately long."
+  },
+  "shipping": {
+    "value": "89%",
+    "detail": "Red Sea disruptions priced in.",
+    "accent": "High"
+  },
+  "macro": {
+    "value": "Neutral",
+    "detail": "DXY at 99.67 is a key driver.",
+    "accent": "Medium"
+  },
+  "geopolitical": {
+    "value": "Medium",
+    "detail": "Global risk score at 50%",
+    "accent": "Medium"
+  },
+  "correlation": {
+    "value": "Clustered",
+    "detail": "Energy complex correlation regime.",
+    "accent": "Neutral"
+  },
+  "portfolioRisk": {
+    "longExposure": "64%",
+    "shortExposure": "36%",
+    "netExposure": "28%",
+    "var": "4.8%",
+    "drawdown": "8.6%",
+    "riskBudget": "14%",
+    "capitalUsage": "Current risk budget is aligned to a conservative portfolio allocation, with 64% long exposure and 36% short protection.",
+    "stressScenario": "A 5% shock to crude prices would move VaR expectations toward the 6.8% level, reinforcing disciplined sizing.",
+    "liquidityProfile": "Prioritizing high-liquidity near-month futures to navigate elevated volatility.",
+    "riskData": [
+      {
+        "name": "2026-04-24",
+        "long": 496,
+        "short": 304,
+        "net": 192
+      },
+      {
+        "name": "2026-05-01",
+        "long": 440,
+        "short": 360,
+        "net": 80
+      },
+      {
+        "name": "2026-05-08",
+        "long": 472,
+        "short": 328,
+        "net": 144
+      },
+      {
+        "name": "2026-05-15",
+        "long": 528,
+        "short": 272,
+        "net": 256
+      },
+      {
+        "name": "2026-05-22",
+        "long": 456,
+        "short": 344,
+        "net": 112
+      },
+      {
+        "name": "2026-05-29",
+        "long": 528,
+        "short": 272,
+        "net": 256
+      },
+      {
+        "name": "2026-06-05",
+        "long": 512,
+        "short": 288,
+        "net": 224
+      }
+    ]
+  },
+  "tradeRecommendation": {
+    "bias": "Neutral/Bearish",
+    "confidence": "87%",
+    "bullishDrivers": [
+      "Live crude inventory draw 7.2M bbl",
+      "DXY strength watch",
+      "Live WTI negative momentum"
+    ],
+    "bearishDrivers": [
+      "Inventory surprise risk",
+      "Elevated volatility premiums",
+      "Macro demand stability"
+    ],
+    "suggestedTrade": "Lean long WTI via front-month futures with defined risk."
+  },
+  "riskMonitor": {
+    "panels": [
+      {
+        "title": "Market Volatility",
+        "score": "HIGH",
+        "detail": "Energy vol metrics (OVX at 47.75) highlight high regime.",
+        "color": "text-orange-400"
+      },
+      {
+        "title": "Liquidity Buffer",
+        "score": "Stressed",
+        "detail": "Capital reserves aligned to current risk budget.",
+        "color": "text-cyan-400"
+      },
+      {
+        "title": "Macro Shock",
+        "score": "Stable",
+        "detail": "DXY moves (+0.04%%) drive macro shock probability.",
+        "color": "text-green-400"
+      },
+      {
+        "title": "Position Defense",
+        "score": "14%",
+        "detail": "Current risk budget is preserved through selective hedging.",
+        "color": "text-purple-400"
+      }
+    ],
+    "geoSummary": "Global risk score sits at Medium due to active monitored headlines.",
+    "stressProfile": "Stress levels are high across energy channels, driven by inventory draws.",
+    "scenarioEngine": "A standard deviation shock would push VaR to 6.3% under current correlations."
+  },
+  "riskFactors": [
+    "WTI -2.54% signals easing crude tension",
+    "DXY at 99.672 remains the macro swing factor",
+    "Inventory draw dynamics continue to define prompt balance"
+  ],
+  "marketMovers": [
+    {
+      "title": "Strong Dollar",
+      "desc": "Macro Tailwind"
+    },
+    {
+      "title": "Inventory Draw",
+      "desc": "Inventory Surprise"
+    },
+    {
+      "title": "Bearish Speculators",
+      "desc": "Positioning Shift"
+    },
+    {
+      "title": "Geopolitical Risk",
+      "desc": "Medium"
+    }
+  ],
+  "marketStats": {
+    "volume": {
+      "value": "0.02M",
+      "change": "+15.2%"
+    },
+    "openInterest": {
+      "value": "818K",
+      "desc": "Active Futures"
+    }
+  },
+  "analyticsInputs": {
+    "WB_C1": -3.6,
+    "CL_VOL20": 47.75,
+    "HO_CL_DIFF": -75.5095,
+    "INVENTORY_DRAW": -7.2,
+    "WTI_PRICE": 78.7,
+    "BRENT_PRICE": 82.3,
+    "DXY": 99.672
+  },
+  "_metadata": {
+    "timestamp": "2026-06-16T07:42:01.700685+00:00",
+    "source": "live-backend"
+  }
+}
