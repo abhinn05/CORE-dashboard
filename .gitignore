@@ -12,3 +12,9 @@ __pycache__/
 # Node
 node_modules/
 dist/
+
+analytics/live/live_features.json
+analytics/live/live_opportunities.json
+analytics/live/live_regime.json
+analytics/live/market_snapshot.json
+analytics/live/signal_log.csv
