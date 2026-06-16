@@ -1458,7 +1458,6 @@ app.get(
   "/api/regime-counts",
   (_, res) => {
 
-    const fs = require("fs");
 
     const csv = fs.readFileSync(
       "analytics/data/processed/regime_counts.csv",
@@ -1501,45 +1500,55 @@ app.get('/api/health', (req, res) => {
 });
 
 app.get(
-  "/api/regime-counts",
+  "/api/regime-stats",
   (_, res) => {
 
     try {
 
-      const csv =
-        fs.readFileSync(
-          "analytics/data/processed/regime_counts.csv",
-          "utf8"
+      const csv = fs.readFileSync(
+        "analytics/data/processed/regime_counts.csv",
+        "utf8"
+      );
+
+      const rows = csv
+        .trim()
+        .split("\n")
+        .slice(1);
+
+      const total = rows
+        .reduce(
+          (
+            acc,
+            row,
+          ) =>
+            acc +
+            Number(
+              row.split(",")[1]
+            ),
+          0
         );
-
-      const rows =
-        csv
-          .trim()
-          .split("\n")
-          .slice(1);
-
-      const data =
-        rows.map((row) => {
-
-          const [
-            regime,
-            count,
-          ] = row.split(",");
-
-          return {
-
-            regime,
-
-            count:
-              Number(count),
-
-          };
-
-        });
 
       res.json({
 
-        data,
+        data: [
+
+          {
+            label:
+              "Total Regimes",
+
+            value:
+              rows.length,
+          },
+
+          {
+            label:
+              "Observations",
+
+            value:
+              total,
+          },
+
+        ],
 
         ts:
           Date.now(),

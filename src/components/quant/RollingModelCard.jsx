@@ -8,22 +8,6 @@ export default function RollingModelCard({
   rollingModels,
 }) {
 
-  const latest = {};
-
-  rollingModels.forEach((row) => {
-
-    const key = row.target;
-
-    if (
-      !latest[key] ||
-      new Date(row.window_end) >
-      new Date(latest[key].window_end)
-    ) {
-      latest[key] = row;
-    }
-
-  });
-
 const grouped = {};
 
 rollingModels.forEach(
@@ -77,35 +61,51 @@ rollingModels.forEach(
 
               <span className="text-purple-400">
 
-                <div className="mt-4 h-[50px]">
+                R²:
 
-                  <ResponsiveContainer
-                      width="100%"
-                      height="100%"
-                  >
+                {" "}
 
-                      <LineChart
-                          data={targetSeries}
-                      >
-
-                          <Line
-                              dataKey="r2"
-                              dot={false}
-                          />
-
-                      </LineChart>
-
-                  </ResponsiveContainer>
-
-              </div>
+                {
+                  targetSeries[
+                    targetSeries.length - 1
+                  ]?.r2
+                }
 
               </span>
 
             </div>
 
+            <div className="mt-4 h-[50px]">
+
+              <ResponsiveContainer
+                width="100%"
+                height="100%"
+              >
+
+                <LineChart
+                  data={targetSeries}
+                >
+
+                  <Line
+                    dataKey="r2"
+                    dot={false}
+                  />
+
+                </LineChart>
+
+              </ResponsiveContainer>
+
+            </div>
+
             <div className="mt-2 text-sm text-gray-400">
 
-              {model.window_end}
+              {
+                new Date(
+                  targetSeries[
+                    targetSeries.length - 1
+                  ]?.window_end
+                ).toLocaleDateString()
+              }
 
             </div>
 
