@@ -6,6 +6,12 @@ import {
   getOpportunities,
 } from "../api/coreApi";
 
+import {
+  getRegimeStats,
+  getRegimeCounts,
+} from "../api/coreApi";
+
+
 export function useCoreAnalytics() {
 
   const [regime, setRegime] =
@@ -19,6 +25,15 @@ export function useCoreAnalytics() {
     setOpportunities,
   ] = useState([]);
 
+  const [regimeStats,
+      setRegimeStats] =
+    useState([]);
+
+  const [
+  regimeCounts,
+  setRegimeCounts,
+] = useState([]);
+
   useEffect(() => {
 
     async function load() {
@@ -27,6 +42,11 @@ export function useCoreAnalytics() {
 
         const regimeData =
           await getCurrentRegime();
+        
+        console.log(
+          "REGIME FETCHED:",
+          regimeData
+        );
         
           console.log(
             "REGIME DATA:",
@@ -79,6 +99,47 @@ export function useCoreAnalytics() {
 
       }
 
+      try {
+
+        const statsData =
+          await getRegimeStats();
+
+        console.log(
+          "REGIME STATS:",
+          statsData
+        );
+
+        setRegimeStats(
+          statsData.data ?? []
+        );
+
+      } catch (err) {
+
+        console.error(err);
+
+      }
+
+
+      try {
+
+        const countData =
+          await getRegimeCounts();
+
+        console.log(
+          "REGIME COUNTS:",
+          countData
+        );
+
+        setRegimeCounts(
+          countData.data ?? []
+        );
+
+      } catch (err) {
+
+        console.error(err);
+
+      }
+
     }
 
     console.log(
@@ -94,6 +155,8 @@ export function useCoreAnalytics() {
     regime,
     models,
     opportunities,
+    regimeStats,
+    regimeCounts,
   };
 
 }

@@ -174,7 +174,9 @@ for task in tasks:
         - predictions
     )
 
-    resid_std = residuals.std()
+    resid_std = model_info[
+        "residual_std"
+    ]
 
     if resid_std == 0:
         continue
@@ -192,7 +194,15 @@ for task in tasks:
     if best_r2 < MIN_R2:
         continue
 
-    score = abs(zscore) * best_r2
+    score = (
+        abs(zscore)
+        * best_r2
+        * np.log(
+            model_info[
+                "observations"
+            ]
+        )
+    )
 
     opportunities.append(
         {
@@ -217,6 +227,19 @@ for task in tasks:
             "opportunity_score": round(
                 float(score),
                 4,
+            ),
+            "explanation": (
+                f"{target} trading "
+                f"{abs(zscore):.1f}σ "
+                f"{'rich' if zscore > 0 else 'cheap'} "
+                f"versus regime expectations."
+            ),
+            "confidence": (
+                "High"
+                if score > 5
+                else "Medium"
+                if score > 2
+                else "Low"
             ),
         }
     )

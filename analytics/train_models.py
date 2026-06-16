@@ -5,6 +5,7 @@ from pathlib import Path
 
 from sklearn.linear_model import LinearRegression, Ridge, Lasso
 from sklearn.metrics import r2_score, mean_absolute_error
+from sklearn.feature_selection import RFECV
 
 INPUT = Path("data/processed/regime_database.parquet")
 OUTPUT = Path("data/processed/regression_results.json")
@@ -100,6 +101,32 @@ for regime in df["REGIME"].unique():
         y_train = y.iloc[:split]
         y_test = y.iloc[split:]
 
+        selector = RFECV(
+            estimator=LinearRegression(),
+            step=1,
+            cv=3,
+            scoring="r2",
+        )
+
+        selector.fit(
+            X_train,
+            y_train,
+        )
+
+        selected_features = list(
+            X_train.columns[
+                selector.support_
+            ]
+        )
+
+        X_train = X_train[
+            selected_features
+        ]
+
+        X_test = X_test[
+            selected_features
+        ]
+
         best_result = None
 
         for model_name, model in models.items():
@@ -112,6 +139,13 @@ for regime in df["REGIME"].unique():
 
             mae = mean_absolute_error(y_test, pred)
 
+            residual_std = float(
+            np.std(
+            y_test - pred
+            )
+            )
+
+
             print(
                 f"    TRAINED {task['target']} | "
                 f"{model_name} | "
@@ -123,6 +157,29 @@ for regime in df["REGIME"].unique():
             if r2 < MIN_R2:
                 continue
 
+            if r2 >= 0.70:
+
+                confidence = "High"
+
+            elif r2 >= 0.40:
+
+                confidence = "Medium"
+
+            else:
+
+                confidence = "Low"
+
+            
+            importance = sorted(
+                zip(
+                    selected_features,
+                    model.coef_,
+                ),
+            key=lambda x: abs(x[1]),
+            reverse=True,
+            )
+
+
             candidate = {
                 "regime": regime,
                 "target": task["target"],
@@ -130,9 +187,19 @@ for regime in df["REGIME"].unique():
                 "observations": len(data),
                 "r2": round(float(r2), 4),
                 "mae": round(float(mae), 4),
+                "residual_std": round(
+                    residual_std,
+                    4,
+                ),
+
+                "confidence":
+                    confidence,
+
+                "top_driver":
+                    importance[0][0],
                 "coefficients": dict(
                     zip(
-                        task["features"],
+                        selected_features,
                         [
                             round(float(c), 4)
                             for c in model.coef_
@@ -143,6 +210,8 @@ for regime in df["REGIME"].unique():
                     float(model.intercept_),
                     4,
                 ),
+                "selected_features":
+                    selected_features,
             }
 
             if (

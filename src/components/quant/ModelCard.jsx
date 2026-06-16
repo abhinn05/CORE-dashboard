@@ -4,7 +4,7 @@ export default function ModelCard({
 
   return (
 
-    <div className="rounded-[24px] bg-[#111827] border border-purple-500/10 p-6 h-full">
+    <div className="rounded-[24px] bg-[#111827] border border-purple-500/10 p-6">
 
       <p className="text-sm uppercase tracking-[0.2em] text-gray-500">
 
@@ -22,7 +22,7 @@ export default function ModelCard({
 
         ) : (
 
-          <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 xl:grid-cols-4 gap-4">
 
             {models.map((model, index) => (
 
@@ -33,6 +33,7 @@ export default function ModelCard({
                   bg-white/[0.04]
                   border border-white/[0.04]
                   p-4
+                  min-h-[130px]
                 "
               >
 

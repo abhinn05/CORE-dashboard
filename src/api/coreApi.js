@@ -31,11 +31,28 @@ export async function getModelResults() {
 }
 
 export async function getRegimeCounts() {
-  const res = await fetch(`${API}/api/regime-counts`);
+
+  const res = await fetch(
+    `${API}/api/regime-counts`
+  );
 
   if (!res.ok) {
-    throw new Error("Failed to fetch regime counts");
+
+    throw new Error(
+      "Failed to fetch regime counts"
+    );
+
   }
 
-  return res.text();
+  return res.json();
+
+}
+export async function getRegimeStats() {
+
+  const res = await fetch(
+    `${API}/api/regime-stats`
+  );
+
+  return res.json();
+
 }

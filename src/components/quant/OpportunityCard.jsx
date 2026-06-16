@@ -46,21 +46,59 @@ export default function OpportunityCard({
 
               </div>
 
-              <div className="mt-2 text-sm text-gray-400">
+              <p className="
+                  text-xs
+                  text-gray-400
+                  mt-2
+              ">
 
-                Z:
+                  {opp.explanation}
 
-                {" "}
+              </p>
 
-                {opp.zscore}
+              <div className="
+                  mt-2
+                  flex
+                  justify-between
+                  items-center
+                  text-sm
+                  text-gray-400
+              ">
 
-                {" • "}
+                  <span>
 
-                R²:
+                      Z:
+                      {" "}
+                      {opp.zscore}
 
-                {" "}
+                      {" • "}
 
-                {opp.r2}
+                      R²:
+                      {" "}
+                      {opp.r2}
+
+                  </span>
+
+                  <span
+                      className={`
+                          text-xs
+                          px-2
+                          py-1
+                          rounded-full
+
+                          ${
+                              opp.confidence === "High"
+                                  ? "bg-green-500/20 text-green-400"
+                                  : opp.confidence === "Medium"
+                                  ? "bg-yellow-500/20 text-yellow-400"
+                                  : "bg-red-500/20 text-red-400"
+                          }
+                      `}
+                  >
+
+                      {opp.confidence}
+
+                  </span>
 
               </div>
 

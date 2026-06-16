@@ -2,11 +2,23 @@ import {
   useCoreAnalytics,
 } from "../hooks/useCoreAnalytics";
 
+import { useRollingModels }
+  from "../hooks/useRollingModels";
+
 import RegimeCard from "../components/quant/RegimeCard";
 
 import OpportunityCard from "../components/quant/OpportunityCard";
 
 import ModelCard from "../components/quant/ModelCard";
+
+import RollingModelCard
+  from "../components/quant/RollingModelCard";
+
+import RegimeStatsCard
+  from "../components/quant/RegimeStatsCard";
+
+import RegimeDistributionCard
+  from "../components/quant/RegimeDistributionCard";
 
 import {
   ResponsiveContainer,
@@ -27,10 +39,18 @@ export default function QuantAnalytics() {
     regime,
     models,
     opportunities,
+    regimeStats,
+    regimeCounts,
   } = useCoreAnalytics();
+
+   const {
+    data: rollingModels = [],
+  } = useRollingModels();
+
   console.log("PAGE REGIME:", regime);
   console.log("PAGE MODELS:", models);
   console.log("PAGE OPPS:", opportunities);
+  console.log("PAGE ROLLING:", rollingModels);
   const effective = live ?? {
     betaSeries: [],
     momentumSignals: [],
@@ -266,32 +286,53 @@ export default function QuantAnalytics() {
         </div>
             </div>
 
-    </div>
+      </div>
 
-   <div className="mt-6 grid grid-cols-1 xl:grid-cols-12 gap-5">
+      <div className="mt-6 grid grid-cols-1 xl:grid-cols-12 gap-5">
 
-      <div className="xl:col-span-3 space-y-5">
+        <div className="xl:col-span-3 space-y-5">
 
-        <RegimeCard
-          regime={regime}
-        />
+          <RegimeCard regime={regime} />
 
-        <OpportunityCard
-          opportunities={opportunities}
-        />
+          <RegimeStatsCard
+            regime={regime}
+            regimeStats={regimeStats}
+          />
+
+          <OpportunityCard
+            opportunities={opportunities}
+          />
+
+        </div>
+
+        <div className="xl:col-span-9 space-y-5">
+
+          <ModelCard
+             models={
+              models.filter(
+                (m) =>
+                  m.regime === regime?.regime
+              ).length > 0
+                ? models.filter(
+                    (m) =>
+                      m.regime === regime?.regime
+                  )
+                : models
+            }
+          />
+
+          <RollingModelCard
+            rollingModels={rollingModels}
+          />
+
+          <RegimeDistributionCard
+              counts={regimeCounts}
+          />
+
+        </div>
 
       </div>
 
-      <div className="xl:col-span-9">
-
-        <ModelCard
-          models={models}
-        />
-
-      </div>
-
     </div>
-
-  </div>
   );
 }

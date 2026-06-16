@@ -1355,12 +1355,35 @@ app.get('/api/current-regime', (req, res) => {
 
     const latest = lines[lines.length - 1].split(',');
 
-    const regimeIndex = headers.indexOf('REGIME');
+    const regimeIndex =
+      headers.indexOf('REGIME');
+
+    const curveIndex =
+      headers.indexOf('CURVE_DRIVER');
+
+    const volIndex =
+      headers.indexOf('VOL_DRIVER');
+
+    const productIndex =
+      headers.indexOf('PRODUCT_DRIVER');
+
+    const wbIndex =
+      headers.indexOf('WB_DRIVER');
 
     res.json({
       date: latest[0],
+
       regime: latest[regimeIndex],
+
+      drivers: {
+        curve: latest[curveIndex],
+        volatility: latest[volIndex],
+        products: latest[productIndex],
+        wb: latest[wbIndex],
+      },
+
       ts: Date.now(),
+
       source: 'analytics',
     });
 
@@ -1400,33 +1423,147 @@ app.get('/api/model-results', (req, res) => {
 });
 
 
-app.get('/api/regime-counts', (req, res) => {
+app.get('/api/rolling-models', (req, res) => {
   try {
+
     const filePath = path.join(
       __dirname,
-      '../analytics/data/processed/regime_counts.csv'
+      '../analytics/data/processed/rolling_model_results.json'
     );
 
-    const data = fs.readFileSync(
-      filePath,
-      'utf8'
+    const data = JSON.parse(
+      fs.readFileSync(filePath, 'utf8')
     );
 
-    res.send(data);
+    res.json({
+      data,
+      ts: Date.now(),
+      source: 'analytics',
+    });
 
   } catch (err) {
+
     console.error(err);
 
     res.status(500).json({
-      error: 'Unable to load regime counts',
+      error: 'Unable to load rolling models',
     });
+
   }
 });
+
+
+
+app.get(
+  "/api/regime-counts",
+  (_, res) => {
+
+    const fs = require("fs");
+
+    const csv = fs.readFileSync(
+      "analytics/data/processed/regime_counts.csv",
+      "utf8"
+    );
+
+    const rows = csv
+      .trim()
+      .split("\n")
+      .slice(1);
+
+    const data = rows.map(
+      (row) => {
+
+        const [
+          regime,
+          count,
+        ] = row.split(",");
+
+        return {
+          regime,
+          count: Number(count),
+        };
+
+      }
+    );
+
+    res.json({
+      data,
+      source: "analytics",
+      ts: Date.now(),
+    });
+
+  }
+);
 
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', ts: Date.now() });
 });
+
+app.get(
+  "/api/regime-counts",
+  (_, res) => {
+
+    try {
+
+      const csv =
+        fs.readFileSync(
+          "analytics/data/processed/regime_counts.csv",
+          "utf8"
+        );
+
+      const rows =
+        csv
+          .trim()
+          .split("\n")
+          .slice(1);
+
+      const data =
+        rows.map((row) => {
+
+          const [
+            regime,
+            count,
+          ] = row.split(",");
+
+          return {
+
+            regime,
+
+            count:
+              Number(count),
+
+          };
+
+        });
+
+      res.json({
+
+        data,
+
+        ts:
+          Date.now(),
+
+        source:
+          "analytics",
+
+      });
+
+    } catch (err) {
+
+      console.error(err);
+
+      res.status(500).json({
+
+        error:
+          err.message,
+
+      });
+
+    }
+
+  }
+);
 
 
 

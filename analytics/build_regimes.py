@@ -95,6 +95,22 @@ df["REGIME"] = (
     + df["WB_REGIME"]
 )
 
+# ==========================
+# REGIME DRIVERS
+# ==========================
+
+df["CURVE_DRIVER"] = df["CURVE_REGIME"]
+
+df["VOL_DRIVER"] = df["VOL_REGIME"]
+
+df["PRODUCT_DRIVER"] = (
+    df["PRODUCT_REGIME"]
+)
+
+df["WB_DRIVER"] = df["WB_REGIME"]
+
+
+
 
 # ==========================
 # REGIME STATS
