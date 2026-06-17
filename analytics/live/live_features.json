@@ -1,3 +1,9 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:8341472f7006a4e15138de3c2206a73ae90750cd87ea754bedbfc4f4259fb0ba
-size 181
+{
+  "WB_C1": -3.71,
+  "CL_VOL20": 53.1,
+  "INVENTORY_DRAW": -7.2,
+  "WTI_PRICE": 75.58,
+  "BRENT_PRICE": 79.29,
+  "DXY": 99.494,
+  "TIMESTAMP": "2026-06-17T01:19:02.014798+00:00"
+}

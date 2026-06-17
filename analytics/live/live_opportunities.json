@@ -1,3 +1,16 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:65e68b1d5ef87271a8d3446be8a4333f2010521d8d7c049eba8c8849dbdf8316
-size 410
+[
+  {
+    "timestamp": "2026-06-17T01:19:02.014798+00:00",
+    "target": "WB_C1",
+    "regime": "HIGH_VOL_LOOSE_WB_DRAW",
+    "actual": -3.71,
+    "expected": -4.21,
+    "residual": 0.5,
+    "zscore": 1.8,
+    "direction": "SELL",
+    "opportunity_score": 1.17,
+    "r2": 0.6457,
+    "confidence": "Medium",
+    "rationale": "Demo signal generated due to lack of validated models for the current regime."
+  }
+]

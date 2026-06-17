@@ -1,3 +1,14 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:0ada30e8bb85336bf4a4ad00dbe87ae924f87a8658650bb4f5726c40adfe0f1c
-size 276
+{
+  "timestamp": "2026-06-17T01:19:02.014798+00:00",
+  "regime": "HIGH_VOL_LOOSE_WB_DRAW",
+  "drivers": {
+    "volatility": "HIGH_VOL",
+    "wb": "LOOSE_WB",
+    "inventory": "DRAW"
+  },
+  "values": {
+    "CL_VOL20": 53.1,
+    "WB_C1": -3.71,
+    "INVENTORY_DRAW": -7.2
+  }
+}

@@ -354,7 +354,7 @@ async function fetchLiveCrackSpread() {
       if (![gas, heat, point.value].every(Number.isFinite)) return null;
       const value = ((2 * gas * 42) + (heat * 42) - (3 * point.value)) / 3;
       return {
-        week: new Date(point.ts * 1000).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+        week: new Date(point.ts * 1000).toLocaleTimeString('en-US', { month: 'short', day: 'numeric' }),
         crack: round(value, 2),
       };
     })
