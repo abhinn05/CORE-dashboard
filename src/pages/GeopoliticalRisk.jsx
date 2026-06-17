@@ -18,6 +18,13 @@ export default function GeopoliticalRisk() {
   const byRegion = Object.fromEntries(effective.map((item) => [item.region, item]));
   const level = (value) => value == null || value === "N/A" ? "N/A" : value >= 85 ? "Severe" : value >= 65 ? "Elevated" : value <= 40 ? "Low" : "Watch";
 
+  const highestRiskRegion =
+  effective.length > 0
+    ? [...effective].sort(
+        (a, b) => b.risk - a.risk
+      )[0]
+    : null;
+
   return (
 
     <div className="grid grid-cols-12 gap-5">
@@ -98,33 +105,7 @@ export default function GeopoliticalRisk() {
 
 })}
 
-      <div className="col-span-4 rounded-[28px] bg-[#0a0f18] border border-white/[0.05] p-6">
-
-        <p className="text-xs uppercase tracking-[0.2em] text-gray-500">
-          Overall Risk
-        </p>
-
-        <h2 className={`text-5xl font-black mt-4 ${signal === 'Extreme Risk' ? 'text-red-400' : signal === 'Elevated Risk' ? 'text-orange-400' : signal === 'Low Risk' ? 'text-green-400' : signal === 'Moderate Risk' ? 'text-yellow-400' : 'text-gray-400'}`}>
-          {signal}
-        </h2>
-
-        <div className="mt-8 flex justify-between">
-          <span>Risk Score</span>
-          <span>{percent(risk)}</span>
-        </div>
-
-        <div className="mt-4 h-2 bg-white/5 rounded-full">
-
-          <div
-            className="h-2 bg-red-400 rounded-full"
-            style={{
-              width: risk != null ? `${risk}%` : "0%"
-            }}
-          />
-
-        </div>
-
-      </div>
+      
 
       <div className="col-span-4 rounded-[28px] bg-[#0a0f18] border border-white/[0.05] p-6">
 
@@ -145,16 +126,80 @@ export default function GeopoliticalRisk() {
       <div className="col-span-4 rounded-[28px] bg-[#0a0f18] border border-white/[0.05] p-6">
 
         <p className="text-xs uppercase tracking-[0.2em] text-gray-500">
-          Shipping Stress
+          Priority Monitor
         </p>
 
-        <h2 className="text-5xl font-black mt-4 text-orange-400">
-          {percent(byRegion["Red Sea"]?.risk ?? risk)}
+        <h2 className="text-5xl font-black mt-4 text-red-300">
+
+          {highestRiskRegion?.region ?? "N/A"}
+
         </h2>
 
         <p className="mt-3 text-gray-400">
-          Red Sea route pressure
+
+          {highestRiskRegion?.description ??
+            "Waiting for live geopolitical data..."}
+
         </p>
+
+        <div className="mt-6 flex justify-between">
+
+          <span>Risk Score</span>
+
+          <span>
+
+            {percent(highestRiskRegion?.risk)}
+
+          </span>
+
+        </div>
+
+      </div>
+
+      <div className="col-span-4 rounded-[28px] bg-[#0a0f18] border border-white/[0.05] p-6">
+
+        <p className="text-xs uppercase tracking-[0.2em] text-gray-500">
+          Supply Vulnerability
+        </p>
+
+        <div className="mt-8 space-y-5">
+
+          {effective.map((item) => (
+
+            <div key={item.region}>
+
+              <div className="flex justify-between mb-2">
+
+                <span>
+
+                  {item.region}
+
+                </span>
+
+                <span>
+
+                  {percent(item.risk)}
+
+                </span>
+
+              </div>
+
+              <div className="h-2 rounded-full bg-white/5">
+
+                <div
+                  className="h-full rounded-full bg-orange-400"
+                  style={{
+                    width: `${item.risk}%`
+                  }}
+                />
+
+              </div>
+
+            </div>
+
+          ))}
+
+        </div>
 
       </div>
 

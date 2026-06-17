@@ -81,17 +81,17 @@ export default function PortfolioRisk() {
         </DashboardCard>
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
         <DashboardCard title="Capital Usage">
           <p className="text-gray-400">
             {effectiveRisk.capitalUsage ?? "Waiting for live portfolio data..."}
           </p>
         </DashboardCard>
-        <DashboardCard title="Stress Scenario">
+        {/* <DashboardCard title="Stress Scenario">
           <p className="text-gray-400">
             {effectiveRisk.stressScenario ?? "Waiting for live portfolio data..."}
           </p>
-        </DashboardCard>
+        </DashboardCard> */}
         <DashboardCard title="Liquidity Profile">
           <p className="text-gray-400">
             {effectiveRisk.liquidityProfile ?? "Waiting for live portfolio data..."}

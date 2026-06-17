@@ -1137,7 +1137,7 @@ app.get('/api/market', async (req, res) => {
       drawdown: drawdownValue !== null ? `${drawdownValue}%` : "N/A",
       riskBudget: dynamicRiskBudget,
       capitalUsage: longExp !== null ? `Current risk budget is aligned to a conservative portfolio allocation, with ${longExp}% long exposure and ${shortExp}% short protection.` : "Waiting for live portfolio data...",
-      stressScenario: varValue !== null ? `A 5% shock to crude prices would move VaR expectations toward the ${round(varValue + 2.0, 1)}% level, reinforcing disciplined sizing.` : "Waiting for live portfolio data...",
+      // stressScenario: varValue !== null ? `A 5% shock to crude prices would move VaR expectations toward the ${round(varValue + 2.0, 1)}% level, reinforcing disciplined sizing.` : "Waiting for live portfolio data...",
       liquidityProfile: dynamicLiquidity,
       riskData: riskData
     };
@@ -1190,6 +1190,149 @@ app.get('/api/market', async (req, res) => {
       ] : [],
       geoSummary: data.geopolitical?.value && data.geopolitical?.value !== "N/A" ? `Global risk score sits at ${data.geopolitical?.value} due to active monitored headlines.` : "Waiting for live geopolitical data...",
       stressProfile: volScore !== "N/A" && draw !== null ? `Stress levels are ${volScore.toLowerCase()} across energy channels, driven by ${draw < 0 ? 'inventory draws' : 'inventory builds'}.` : "Waiting for live risk data...",
+      scenarios: [
+
+        {
+          title: "Iran Closure",
+          probability: "18%",
+          shock: "+$9 WTI",
+          var:
+            varValue !== null
+              ? `${round(varValue + 3.3,1)}%`
+              : "N/A",
+          drawdown:
+            drawdownValue !== null
+              ? `${round(drawdownValue + 4.5,1)}%`
+              : "N/A",
+        },
+
+        {
+          title: "OPEC Surprise",
+          probability: "24%",
+          shock: "-$4 WTI",
+          var:
+            varValue !== null
+              ? `${round(varValue + 0.9,1)}%`
+              : "N/A",
+          drawdown:
+            drawdownValue !== null
+              ? `${round(drawdownValue + 1.5,1)}%`
+              : "N/A",
+        },
+
+        {
+          title: "Fed Shock",
+          probability: "35%",
+          shock: "DXY +2%",
+          var:
+            varValue !== null
+              ? `${round(varValue + 1.7,1)}%`
+              : "N/A",
+          drawdown:
+            drawdownValue !== null
+              ? `${round(drawdownValue + 2.0,1)}%`
+              : "N/A",
+        },
+
+        {
+          title: "Inventory Shock",
+          probability: "28%",
+          shock:
+            draw !== null
+              ? `${draw > 0 ? "-" : "+"}$3 WTI`
+              : "N/A",
+          var:
+            varValue !== null
+              ? `${round(varValue + 0.7,1)}%`
+              : "N/A",
+          drawdown:
+            drawdownValue !== null
+              ? `${round(drawdownValue + 1.1,1)}%`
+              : "N/A",
+        }
+
+      ],
+
+      contributors: [
+
+        {
+          factor: "OVX",
+          score:
+            clamp(
+              round(
+                Number(data.ovx?.value || 0) * 2,
+                0
+              ),
+              0,
+              100
+            )
+        },
+
+        {
+          factor: "Inventory",
+          score:
+            draw !== null
+              ? clamp(
+                  round(
+                    Math.abs(draw) * 10,
+                    0
+                  ),
+                  0,
+                  100
+                )
+              : 0
+        },
+
+        {
+          factor: "Geopolitics",
+          score:
+            geo?.length
+              ? round(
+                  geo.reduce(
+                    (a,b) => a + b.risk,
+                    0
+                  ) / geo.length,
+                  0
+                )
+              : 0
+        },
+
+        {
+          factor: "Macro",
+          score:
+            clamp(
+              round(
+                Math.abs(
+                  Number(data.dxy?.change || 0)
+                ) * 100,
+                0
+              ),
+              0,
+              100
+            )
+        }
+
+      ],
+
+      recommendations: [
+
+        varValue > 4
+          ? "Reduce gross exposure"
+          : "Maintain current sizing",
+
+        Number(data.ovx?.value) > 40
+          ? "Increase hedge coverage"
+          : "Volatility remains contained",
+
+        draw < 0
+          ? "Inventory draws support prompt crude"
+          : "Monitor inventory builds",
+
+        geo?.some(g => g.risk > 80)
+          ? "Closely monitor geopolitical headlines"
+          : "Geopolitical backdrop remains manageable"
+
+      ],
       scenarioEngine: varValue !== null ? `A standard deviation shock would push VaR to ${round(varValue + 1.5, 1)}% under current correlations.` : "Waiting for live volatility data..."
     };
 

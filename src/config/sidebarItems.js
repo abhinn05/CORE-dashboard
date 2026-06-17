@@ -19,7 +19,7 @@ const sidebarItems = [
       { icon: "◉", id: "futures", label: "Futures Curve" },
       { icon: "◈", id: "crack", label: "Crack Spreads" },
       { icon: "◍", id: "cftc", label: "CFTC Analytics" },
-      { icon: "📊", id: "correlation", label: "Correlation" },
+      { icon: "📊", id: "correlation", label: "Cross Asset" },
     ],
   },
   {

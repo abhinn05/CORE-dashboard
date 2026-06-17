@@ -18,6 +18,25 @@ export default function NewsIntelligence() {
   const neutral = typeof bullish === 'number' && typeof bearish === 'number' ? 100 - bullish - bearish : "N/A";
   const narrative = dominantNarrative(effective);
 
+  const latestNews = useMemo(
+  () => (liveNews ?? []).slice(0, 5),
+  [liveNews]
+);
+  const formatTimestamp = (value) => {
+  if (!value) return "";
+
+  try {
+    return new Date(value).toLocaleString("en-US", {
+      month: "short",
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+    });
+  } catch {
+    return value;
+  }
+};
+
   return (
     <div className="h-full grid grid-cols-12 gap-5">
 
@@ -73,9 +92,21 @@ export default function NewsIntelligence() {
                   {item.category}
                 </span>
 
-                <span className="text-xs text-gray-500">
-                  {item.source ?? "NewsAPI Live"}
-                </span>
+                <div className="text-right">
+
+                  <div className="text-xs text-gray-500">
+                    {item.source ?? "NewsAPI Live"}
+                  </div>
+
+                  <div className="text-[10px] text-gray-600 mt-1">
+                    {formatTimestamp(
+                      item.timestamp ??
+                      item.publishedAt ??
+                      item.time
+                    )}
+                  </div>
+
+                </div>
 
               </div>
             </div>
