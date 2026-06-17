@@ -10,6 +10,7 @@ import {
 
 import useMarket from "../hooks/useMarket";
 import { useInventory } from "../hooks";
+import { useNews } from "../hooks";
 import { inventoryTrend } from "../analytics/inventoryEngine";
 import SectionHeader from "../components/SectionHeader";
 import DashboardCard from "../components/DashboardCard";
@@ -30,6 +31,13 @@ export default function MasterDashboard() {
     detail: effectiveMarket.inventory?.detail ?? "N/A",
     accent: effectiveInventory.length > 1 ? inventoryTrend(effectiveInventory) : "Neutral",
   }), [effectiveInventory, effectiveMarket]);
+
+  const { data: liveNews } = useNews();
+
+  const latestNews = useMemo(
+    () => (liveNews ?? []).slice(0, 5),
+    [liveNews]
+  );
 
   const cardList = useMemo(() => {
     const dynamicIntelligenceCards = effectiveMarket.dynamicIntelligenceCards ?? [
@@ -70,6 +78,30 @@ export default function MasterDashboard() {
   const alerts = useMemo(() => effectiveMarket.alertRules || [], [effectiveMarket]);
   const recommendation = useMemo(() => effectiveMarket.tradeRecommendation || {}, [effectiveMarket]);
 
+  const inventory = cardList.find(
+    (card) => card.title === "Inventory Signal"
+  );
+
+  const cftc = cardList.find(
+    (card) => card.title === "CFTC Positioning"
+  );
+
+  const shipping = cardList.find(
+    (card) => card.title === "Shipping Risk"
+  );
+
+  const macro = cardList.find(
+    (card) => card.title === "Macro Regime"
+  );
+
+  const geopolitical = cardList.find(
+    (card) => card.title === "Geopolitical Risk"
+  );
+
+  const correlation = cardList.find(
+    (card) => card.title === "Correlation Regime"
+  );
+
   return (
     <div className="h-full w-full overflow-y-auto overflow-x-hidden space-y-4 pb-6">
       <SectionHeader
@@ -100,14 +132,124 @@ export default function MasterDashboard() {
             </div>
           </DashboardCard>
 
-          <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
-            {cardList.map((card) => (
-              <DashboardCard key={card.title} title={card.title} badge={card.accent} className="p-4">
-                <p className="text-3xl font-black text-white">{card.value}</p>
-                <p className="mt-3 text-sm text-gray-400">{card.detail}</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+
+            {/* Row 1 */}
+            {[inventory, cftc, shipping].map((card) => (
+              <DashboardCard
+                key={card.title}
+                title={card.title}
+                badge={card.accent}
+                className="p-4"
+              >
+                <p className="text-3xl font-black text-white">
+                  {card.value}
+                </p>
+
+                <p className="mt-3 text-sm text-gray-400">
+                  {card.detail}
+                </p>
               </DashboardCard>
             ))}
+
+            {/* Column 1 */}
+            <div className="space-y-3">
+
+              {[macro, correlation].map((card) => (
+                <DashboardCard
+                  key={card.title}
+                  title={card.title}
+                  badge={card.accent}
+                  className="p-4"
+                >
+                  <p className="text-3xl font-black text-white">
+                    {card.value}
+                  </p>
+
+                  <p className="mt-3 text-sm text-gray-400">
+                    {card.detail}
+                  </p>
+                </DashboardCard>
+              ))}
+
+            </div>
+
+            {/* Column 2 */}
+            <DashboardCard
+              title="Latest Energy News"
+              badge="Live"
+              className="p-4"
+            >
+              <div className="space-y-3">
+
+                {latestNews.slice(0, 5).map((news, idx) => (
+
+                  <div
+                    key={idx}
+                    className="
+                      group relative
+                      border border-transparent
+                      border-b border-white/5 last:border-b-0
+                      rounded-2xl px-3 py-3
+                      transition-all duration-300 ease-out
+                      hover:-translate-y-1
+                      hover:scale-[1.3]
+                      hover:bg-gradient-to-br
+                      hover:from-cyan-500/[0.08]
+                      hover:to-blue-500/[0.04]
+                      hover:border-cyan-400/20
+                      hover:shadow-[0_8px_32px_rgba(34,211,238,0.12)]
+                      hover:z-20
+                      hover:cursor-pointer
+                    "
+                  >
+
+                    <p className="text-sm text-white line-clamp-2">
+                      {news.headline}
+                    </p>
+
+                    <div className="mt-2 flex justify-between">
+
+                      <span className="text-xs text-gray-500">
+                        {news.source}
+                      </span>
+
+                      <span
+                        className={`text-xs font-semibold ${
+                          news.sentiment === "Bullish"
+                            ? "text-green-400"
+                            : "text-red-400"
+                        }`}
+                      >
+                        {news.sentiment}
+                      </span>
+
+                    </div>
+
+                  </div>
+
+                ))}
+
+              </div>
+            </DashboardCard>
+
+            {/* Column 3 */}
+            <DashboardCard
+              title={geopolitical.title}
+              badge={geopolitical.accent}
+              className="p-4 self-start"
+            >
+              <p className="text-3xl font-black text-white">
+                {geopolitical.value}
+              </p>
+
+              <p className="mt-3 text-sm text-gray-400">
+                {geopolitical.detail}
+              </p>
+            </DashboardCard>
+
           </div>
+
         </div>
 
         <div className="space-y-5">
