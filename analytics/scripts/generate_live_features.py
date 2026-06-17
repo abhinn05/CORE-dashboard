@@ -74,10 +74,21 @@ def main():
                 snapshot["dxy"]["value"]
             ),
 
+        "HO_CL_DIFF":
+
+            parse_float(
+                snapshot["heatingOil"]["value"]
+            )
+
+            -
+
+            parse_float(
+                snapshot["wti"]["value"]
+            ),
+
         "TIMESTAMP":
 
             snapshot["_metadata"]["timestamp"],
-
     }
 
     with open(OUTPUT_FILE, "w") as f:

@@ -54,20 +54,45 @@ def main():
     # Inventory regime
     #
 
-    inv = features["INVENTORY_DRAW"]
+    #
+# Curve regime
+#
 
-    if inv < thresholds["INVENTORY_DRAW_median"]:
+    curve_regime = (
 
-        inventory_regime = "DRAW"
+        "BACKWARDATION"
+
+        if wb < 0
+
+        else "CONTANGO"
+
+    )
+
+
+    #
+    # Product regime
+    #
+
+    product = features["HO_CL_DIFF"]
+
+    if product >= thresholds["HO_CL_DIFF_median"]:
+
+        product_regime = "STRONG_PRODUCTS"
 
     else:
 
-        inventory_regime = "BUILD"
+        product_regime = "WEAK_PRODUCTS"
 
     regime = "_".join([
+
+        curve_regime,
+
         vol_regime,
+
+        product_regime,
+
         wb_regime,
-        inventory_regime,
+
     ])
 
     output = {
@@ -82,17 +107,17 @@ def main():
 
         "drivers": {
 
-            "volatility":
+            "curve":
+                curve_regime,
 
+            "volatility":
                 vol_regime,
 
+            "products":
+                product_regime,
+
             "wb":
-
                 wb_regime,
-
-            "inventory":
-
-                inventory_regime,
 
         },
 
@@ -106,9 +131,8 @@ def main():
 
                 wb,
 
-            "INVENTORY_DRAW":
-
-                inv,
+            "HO_CL_DIFF":
+                product,
 
         }
 

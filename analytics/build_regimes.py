@@ -2,8 +2,12 @@ import pandas as pd
 import numpy as np
 from pathlib import Path
 
-INPUT = Path("data/processed/master_features.parquet")
-OUTPUT = Path("data/processed/regime_database.parquet")
+from pathlib import Path
+
+BASE_DIR = Path(__file__).parent
+
+INPUT = BASE_DIR / "data" / "processed" / "master_features.parquet"
+OUTPUT = BASE_DIR / "data" / "processed" / "regime_database.parquet"
 
 print("Loading master features...")
 
@@ -55,10 +59,10 @@ df["CURVE_REGIME"] = np.where(
 
 print("Creating product regimes...")
 
-product_median = df["LGO_LCO_DIFF"].median()
+product_median = df["HO_CL_DIFF"].median()
 
 df["PRODUCT_REGIME"] = np.where(
-    df["LGO_LCO_DIFF"] >= product_median,
+    df["HO_CL_DIFF"] >= product_median,
     "STRONG_PRODUCTS",
     "WEAK_PRODUCTS",
 )
@@ -138,13 +142,12 @@ print(counts.head(10))
 
 df.to_parquet(OUTPUT)
 
-df.to_csv(
-    "data/processed/regime_database.csv"
-)
+REGIME_CSV = BASE_DIR / "data" / "processed" / "regime_database.csv"
+COUNTS_CSV = BASE_DIR / "data" / "processed" / "regime_counts.csv"
 
-counts.to_csv(
-    "data/processed/regime_counts.csv"
-)
+df.to_csv(REGIME_CSV)
+
+counts.to_csv(COUNTS_CSV)
 
 
 print("\nSaved:")

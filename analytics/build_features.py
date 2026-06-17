@@ -2,8 +2,10 @@ import pandas as pd
 import numpy as np
 from pathlib import Path
 
-RAW_DIR = Path("data/raw")
-OUT_DIR = Path("data/processed")
+BASE_DIR = Path(__file__).parent
+
+RAW_DIR = BASE_DIR / "data" / "raw"
+OUT_DIR = BASE_DIR / "data" / "processed"
 
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 

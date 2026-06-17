@@ -1,10 +1,10 @@
 [
   {
-    "timestamp": "2026-06-17T03:00:02.271051+00:00",
+    "timestamp": "2026-06-17T05:04:01.554552+00:00",
     "target": "WB_C1",
     "regime": "HIGH_VOL_LOOSE_WB_DRAW",
-    "actual": -3.71,
-    "expected": -4.21,
+    "actual": -3.59,
+    "expected": -4.09,
     "residual": 0.5,
     "zscore": 1.8,
     "direction": "SELL",

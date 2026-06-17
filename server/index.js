@@ -953,6 +953,98 @@ async function proxyFallback(req, res, { envUrl, feedName, defaultUrl }) {
   return res.status(500).json({ error: 'Data unavailable', ts: Date.now(), source: 'error' });
 }
 
+function nextEIARelease() {
+
+  const now = new Date();
+
+  const release = new Date(now);
+
+  release.setHours(14, 30, 0, 0); // 10:30 ET ≈ 14:30 UTC
+
+  let daysUntilWednesday =
+    (3 - now.getUTCDay() + 7) % 7;
+
+  if (
+    daysUntilWednesday === 0 &&
+    now > release
+  ) {
+    daysUntilWednesday = 7;
+  }
+
+  release.setUTCDate(
+    release.getUTCDate() + daysUntilWednesday
+  );
+
+  return release.toLocaleDateString(
+    "en-US",
+    {
+      month: "short",
+      day: "numeric",
+    }
+  );
+
+}
+
+const FOMC_2026 = [
+
+  "Jul 29",
+  "Sep 16",
+  "Oct 28",
+  "Dec 09",
+
+];
+
+function nextFOMC() {
+
+  const today = new Date();
+
+  const year = today.getFullYear();
+
+  for (const date of FOMC_2026) {
+
+    const d = new Date(`${date}, ${year}`);
+
+    if (d >= today) {
+
+      return date;
+
+    }
+
+  }
+
+  return "TBA";
+
+}
+
+const OPEC_2026 = [
+
+  "Jun 30",
+  "Dec 03",
+
+];
+
+function nextOPEC() {
+
+  const today = new Date();
+
+  const year = today.getFullYear();
+
+  for (const date of OPEC_2026) {
+
+    const d = new Date(`${date}, ${year}`);
+
+    if (d >= today) {
+
+      return date;
+
+    }
+
+  }
+
+  return "TBA";
+
+}
+
 app.get('/api/market', async (req, res) => {
   try {
     const [quotes, wtiSeries, brentSeries, hoSeries] = await Promise.all([
@@ -1356,6 +1448,105 @@ app.get('/api/market', async (req, res) => {
       volume: { value: realVolume !== null ? `${realVolume}M` : "N/A", change: varValue !== null ? (varValue > 4 ? '+15.2%' : '-4.1%') : "N/A" },
       openInterest: { value: data.cftc?.oi != null ? `${data.cftc.oi}K` : "N/A", desc: 'Active Futures' }
     };
+
+    data.catalysts = [
+
+      {
+
+        title:
+          "EIA Petroleum Status Report",
+
+        date:
+          nextEIARelease(),
+
+        impact:
+          "High",
+
+      },
+
+      {
+
+        title:
+          "FOMC Meeting",
+
+        date:
+          nextFOMC(),
+
+        impact:
+          "High",
+
+      },
+
+      {
+
+        title:
+          "OPEC Meeting",
+
+        date:
+          nextOPEC(),
+
+        impact:
+          "High",
+
+      },
+
+    ];
+
+    data.signalExplanation = [];
+
+    if (draw !== null) {
+
+      data.signalExplanation.push(
+
+        draw < 0
+          ? `Inventory draw of ${Math.abs(draw)}M bbl is supporting crude.`
+          : `Inventory build of ${draw}M bbl is weighing on balances.`
+
+      );
+
+    }
+
+    if (net !== null) {
+
+      data.signalExplanation.push(
+
+        net > 200
+          ? "Managed money positioning remains supportive."
+          : "Speculative positioning remains cautious."
+
+      );
+
+    }
+
+    if (Number(data.ovx?.value) > 40) {
+
+      data.signalExplanation.push(
+
+        "Elevated OVX indicates heightened market stress."
+
+      );
+
+    }
+
+    if (Number(data.dxy?.change) < 0) {
+
+      data.signalExplanation.push(
+
+        "Dollar weakness provides support for oil prices."
+
+      );
+
+    }
+
+    if (Number(data.dxy?.change) > 0) {
+
+      data.signalExplanation.push(
+
+        "Dollar strength acts as a headwind for crude."
+
+      );
+
+    }
 
     const brentMap = new Map(brentSeries.map(p => [p.ts, p.value]));
     const hoMap = new Map(hoSeries.map(p => [p.ts, p.value]));

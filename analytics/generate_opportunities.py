@@ -35,7 +35,7 @@ tasks = [
             "CL_M1M2",
             "LCO_M1M2",
             "CL_VOL20",
-            "LGO_LCO_DIFF",
+            "HO_CL_DIFF",
         ],
     },
     {
@@ -47,7 +47,7 @@ tasks = [
         ],
     },
     {
-        "target": "LGO_LCO_DIFF",
+        "target": "HO_CL_DIFF",
         "features": [
             "CL_M1M2",
             "WB_C1",

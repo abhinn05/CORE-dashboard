@@ -59,6 +59,8 @@ export default function SignalLogCard({
     if (variant === "compact") {
 
         const latestSignal = signals[0];
+        console.log("LATEST SIGNAL:", latestSignal);
+        console.log("ALL SIGNALS:", signals);
 
         if (!latestSignal) {
 
@@ -74,9 +76,15 @@ export default function SignalLogCard({
 
                         </h3>
 
-                        <span className="text-xs tracking-[0.3em] text-slate-500">
+                        <span
+                            className={`text-xs tracking-[0.3em] ${
+                                status === "OPEN"
+                                    ? "text-green-400"
+                                    : "text-red-400"
+                            }`}
+                        >
 
-                            LIVE
+                            {status}
 
                         </span>
 
@@ -94,26 +102,22 @@ export default function SignalLogCard({
 
         }
 
-        const [
-
-            signalId,
-            timestamp,
-            regime,
-            target,
-            direction,
-            actual,
-            expected,
-            zscore,
-            confidence,
-            rationale,
-            opportunityScore,
-            status,
-            entryPrice,
-            exitPrice,
-            pnl,
-            exitTimestamp,  
-
-        ] = latestSignal.split(",");
+        const signalId = latestSignal?.signal_id;
+        const timestamp = latestSignal?.timestamp;
+        const instrument =
+        latestSignal?.instrument ??
+        latestSignal?.target ??
+        "N/A";
+        const regime = latestSignal?.regime;
+        const direction = latestSignal?.direction;
+        const rationale = latestSignal?.rationale;
+        const confidence = latestSignal?.confidence;
+        const status = latestSignal?.status;
+        const entryPrice = latestSignal?.entry_price;
+        const exitPrice = latestSignal?.exit_price;
+        const pnl = latestSignal?.pnl;
+        const zscore = latestSignal?.zscore;
+        const opportunityScore = latestSignal?.opportunity_score;
 
         return (
 
@@ -145,9 +149,9 @@ export default function SignalLogCard({
 
                         </p>
 
-                        <p className="text-3xl font-black">
+                        <p className="text-3xl font-black text-pink-400">
 
-                            {target}
+                            {instrument}
 
                         </p>
 
@@ -280,28 +284,27 @@ export default function SignalLogCard({
 
           : (
 
-              signals.map((signal, index) => {
+              (signals ?? []).map((signal, index) => {
 
-                const [
-
-                    signalId,
-                    timestamp,
-                    regime,
-                    target,
-                    direction,
-                    actual,
-                    expected,
-                    zscore,
-                    confidence,
-                    rationale,
-                    opportunityScore,
-                    status,
-                    entryPrice,
-                    exitPrice,
-                    pnl,
-                    exitTimestamp,
-
-                ] = signal.split(",");
+                const signalId = signal.signal_id;
+                const timestamp = signal.timestamp;
+                const regime = signal.regime;
+                const target =
+                signal.instrument ??
+                signal.target ??
+                "N/A";
+                const direction = signal.direction;
+                const confidence = signal.confidence;
+                const rationale = signal.rationale;
+                const opportunityScore =
+                    signal.opportunity_score;
+                const status = signal.status;
+                const entryPrice =
+                    signal.entry_price;
+                const exitPrice =
+                    signal.exit_price;
+                const pnl = signal.pnl;
+                const zscore = signal.zscore;
 
                 return (
 

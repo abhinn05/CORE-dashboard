@@ -26,17 +26,41 @@ export function useSignalLog() {
 
             );
 
-            const text = await response.text();
+            const text = await response.text(); 
 
-            return text
-
+            const rows = text
                 .trim()
+                .split(/\r?\n/);
 
-                .split(/\r?\n/)
+            const headers = rows[0]
+                .split(",");
 
+            return rows
                 .slice(1)
+                .filter(Boolean)
+                .map((row) => {
 
-                .filter(Boolean);
+                    const values =
+                        row.split(",");
+
+                    return headers.reduce(
+
+                        (obj, header, index) => {
+
+                            obj[
+                                header.trim()
+                            ] =
+                                values[index];
+
+                            return obj;
+
+                        },
+
+                        {}
+
+                    );
+
+                });
 
         },
 

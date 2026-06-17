@@ -1,3 +1,88 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:ed3b8d18be8d7dbbb51c313e728faaf1831e160d886e6f7084a75359f4ac603a
-size 2665
+[
+    {
+        "regime": "BACKWARDATION_HIGH_VOL_WEAK_PRODUCTS_TIGHT_WB",
+        "target": "CL_M1M2",
+        "model": "Ridge",
+        "observations": 38,
+        "r2": 0.7235,
+        "mae": 0.4113,
+        "residual_std": 0.2434,
+        "confidence": "High",
+        "top_driver": "CL_VOL20",
+        "coefficients": {
+            "WB_C1": 0.2617,
+            "CL_VOL20": 0.3071,
+            "HO_CL_DIFF": -0.0675
+        },
+        "intercept": -4.1774,
+        "selected_features": [
+            "WB_C1",
+            "CL_VOL20",
+            "HO_CL_DIFF"
+        ]
+    },
+    {
+        "regime": "BACKWARDATION_LOW_VOL_WEAK_PRODUCTS_TIGHT_WB",
+        "target": "CL_M1M2",
+        "model": "Lasso",
+        "observations": 104,
+        "r2": 0.4351,
+        "mae": 0.3942,
+        "residual_std": 0.4119,
+        "confidence": "Medium",
+        "top_driver": "WB_C1",
+        "coefficients": {
+            "WB_C1": 0.2768,
+            "CL_VOL20": 0.0,
+            "HO_CL_DIFF": -0.0589
+        },
+        "intercept": -2.9875,
+        "selected_features": [
+            "WB_C1",
+            "CL_VOL20",
+            "HO_CL_DIFF"
+        ]
+    },
+    {
+        "regime": "BACKWARDATION_HIGH_VOL_WEAK_PRODUCTS_TIGHT_WB",
+        "target": "HO_CL_DIFF",
+        "model": "Lasso",
+        "observations": 38,
+        "r2": 0.2954,
+        "mae": 9.2931,
+        "residual_std": 6.1916,
+        "confidence": "Low",
+        "top_driver": "CL_VOL20",
+        "coefficients": {
+            "CL_M1M2": -7.4111,
+            "CL_VOL20": 13.0759
+        },
+        "intercept": -93.5442,
+        "selected_features": [
+            "CL_M1M2",
+            "CL_VOL20"
+        ]
+    },
+    {
+        "regime": "BACKWARDATION_LOW_VOL_WEAK_PRODUCTS_LOOSE_WB",
+        "target": "CL_M1M2",
+        "model": "Ridge",
+        "observations": 69,
+        "r2": 0.2217,
+        "mae": 0.1431,
+        "residual_std": 0.132,
+        "confidence": "Low",
+        "top_driver": "WB_C1",
+        "coefficients": {
+            "WB_C1": 0.1659,
+            "CL_VOL20": 0.1061,
+            "HO_CL_DIFF": -0.05
+        },
+        "intercept": -2.499,
+        "selected_features": [
+            "WB_C1",
+            "CL_VOL20",
+            "HO_CL_DIFF"
+        ]
+    }
+]

@@ -9,6 +9,7 @@ import {
 } from "recharts";
 
 import useMarket from "../hooks/useMarket";
+import { useSignalLog } from "../hooks/useSignalLog";
 import { useInventory } from "../hooks";
 import { useNews } from "../hooks";
 import { inventoryTrend } from "../analytics/inventoryEngine";
@@ -33,6 +34,12 @@ export default function MasterDashboard() {
   }), [effectiveInventory, effectiveMarket]);
 
   const { data: liveNews } = useNews();
+
+  const {
+  signals = [],
+} = useSignalLog();
+
+console.log("SIGNALS:", signals);
 
   const latestNews = useMemo(
     () => (liveNews ?? []).slice(0, 5),
@@ -101,6 +108,30 @@ export default function MasterDashboard() {
 
   const alerts = useMemo(() => effectiveMarket.alertRules || [], [effectiveMarket]);
   const recommendation = useMemo(() => effectiveMarket.tradeRecommendation || {}, [effectiveMarket]);
+
+  const coreSignal = useMemo(() => {
+
+    const sortedSignals = [...signals].sort(
+
+      (a, b) =>
+        new Date(b.timestamp) -
+        new Date(a.timestamp)
+
+    );
+
+    return (
+
+      sortedSignals.find(
+
+        signal => signal.status === "OPEN"
+
+      ) ||
+
+      sortedSignals[0]
+
+    );
+
+  }, [signals]);
 
   const inventory = cardList.find(
     (card) => card.title === "Inventory Signal"
@@ -284,25 +315,139 @@ export default function MasterDashboard() {
         </div>
 
         <div className="space-y-5">
-          <DashboardCard title="AI Market Signal" badge="Signal">
-            <div className="space-y-4 text-sm text-gray-300">
-              <div className="flex items-center justify-between">
-                <span>Current outlook</span>
-                <span className={recommendation.bias?.includes('Bearish') ? 'text-red-400' : 'text-green-400'}>{recommendation.bias || 'N/A'}</span>
+          <DashboardCard
+            title="CORE Trade Signal"
+            badge={
+              coreSignal?.status ??
+              "LIVE"
+            }
+          >
+
+            <div className="space-y-4">
+
+              <div className="flex justify-between">
+
+                <span className="text-gray-400">
+                  Direction
+                </span>
+
+                <span
+                  className={
+                    coreSignal?.direction === "BUY"
+
+                      ? "text-green-400"
+
+                      : "text-red-400"
+                  }
+                >
+
+                  {coreSignal?.direction ??
+                    "N/A"}
+
+                </span>
+
               </div>
-              <div className="flex items-center justify-between">
-                <span>Confidence</span>
-                <span className="text-cyan-400">{recommendation.confidence || 'N/A'}</span>
+
+              <div className="flex justify-between">
+
+                <span className="text-gray-400">
+                  Instrument
+                </span>
+
+                <span>
+
+                  {coreSignal?.instrument ??
+                    coreSignal?.target ??
+                    "N/A"}
+
+                </span>
+
               </div>
-              <div className="flex items-center justify-between">
-                <span>Volatility (OVX)</span>
-                <span className={effectiveMarket.ovx?.status?.includes('High') ? "text-red-400" : "text-amber-300"}>{effectiveMarket.ovx?.status || 'N/A'}</span>
+
+              <div className="flex justify-between">
+
+                <span className="text-gray-400">
+                  Regime
+                </span>
+
+                <span>
+
+                  {coreSignal?.regime ??
+                    "N/A"}
+
+                </span>
+
               </div>
-              <div className="flex items-center justify-between">
-                <span>Supply momentum</span>
-                <span className={effectiveMarket.inventory?.momentum?.includes('Tightening') ? 'text-green-400' : 'text-red-400'}>{effectiveMarket.inventory?.momentum || 'N/A'}</span>
+
+              <div className="flex justify-between">
+
+                <span className="text-gray-400">
+                  Confidence
+                </span>
+
+                <span>
+
+                  {coreSignal?.confidence ??
+                    "N/A"}
+
+                </span>
+
               </div>
+
+              <div className="flex justify-between">
+
+                <span className="text-gray-400">
+                  Entry Price
+                </span>
+
+                <span>
+
+                  {coreSignal?.entry_price ??
+                    "N/A"}
+
+                </span>
+
+              </div>
+
+              <div className="mt-6">
+
+                <p className="text-xs uppercase tracking-[0.2em] text-gray-500 mb-4">
+
+                  Why This Signal
+
+                </p>
+
+                <div className="space-y-3">
+
+                  {(effectiveMarket.signalExplanation ?? []).map(
+
+                    (reason, idx) => (
+
+                      <div
+                        key={idx}
+                        className="
+                          rounded-xl
+                          bg-white/[0.03]
+                          border border-white/[0.04]
+                          px-4 py-3
+                          text-sm text-gray-300
+                        "
+                      >
+
+                        ✓ {reason}
+
+                      </div>
+
+                    )
+
+                  )}
+
+                </div>
+
+              </div>
+
             </div>
+
           </DashboardCard>
 
           <TradeRecommendation recommendation={recommendation} />
@@ -313,6 +458,53 @@ export default function MasterDashboard() {
             variant="compact"
           />
           <AlertCenter alerts={alerts} />
+
+          <DashboardCard title="Upcoming Catalysts" badge="Calendar">
+
+            <div className="space-y-4">
+
+              {(effectiveMarket.catalysts ?? []).map((event) => (
+
+                <div
+                  key={event.title}
+                  className="flex justify-between items-center border-b border-white/5 pb-3 last:border-none"
+                >
+
+                  <div>
+
+                    <p className="font-medium">
+                      {event.title}
+                    </p>
+
+                    <p className="text-xs text-gray-500">
+                      {event.date}
+                    </p>
+
+                  </div>
+
+                  <span
+                    className={`
+                      text-xs px-2 py-1 rounded-full
+
+                      ${
+                        event.impact === "High"
+                          ? "bg-red-500/10 text-red-300"
+                          : event.impact === "Medium"
+                          ? "bg-orange-500/10 text-orange-300"
+                          : "bg-green-500/10 text-green-300"
+                      }
+                    `}
+                  >
+                    {event.impact}
+                  </span>
+
+                </div>
+
+              ))}
+
+            </div>
+
+          </DashboardCard>
         </div>
       </div>
     </div>

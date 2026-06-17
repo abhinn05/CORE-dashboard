@@ -1,6 +1,6 @@
 import pandas as pd
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, UTC
 
 BASE_DIR = Path(__file__).parent.parent
 
@@ -20,6 +20,11 @@ FEATURE_FILE = (
 def main():
 
     df = pd.read_csv(SIGNAL_FILE)
+
+    if "exit_timestamp" not in df.columns:
+        df["exit_timestamp"] = None
+    else:
+        df["exit_timestamp"] = df["exit_timestamp"].astype(object)
 
     if len(df) == 0:
 
@@ -71,9 +76,7 @@ def main():
 
             df.loc[idx, "exit_timestamp"] = (
 
-                datetime.utcnow()
-
-                .isoformat()
+                datetime.now(UTC).isoformat()
 
             )
 
