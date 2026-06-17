@@ -2,16 +2,16 @@
   "wti": {
     "id": "wti",
     "label": "WTI",
-    "value": "74.78",
-    "change": "-0.65%",
+    "value": "74.85",
+    "change": "-0.56%",
     "trend": "Bearish",
     "severity": "Low"
   },
   "brent": {
     "id": "brent",
     "label": "Brent",
-    "value": "78.39",
-    "change": "-0.72%",
+    "value": "78.32",
+    "change": "-0.81%",
     "trend": "Bearish",
     "severity": "Low"
   },
@@ -35,16 +35,16 @@
   "heatingOil": {
     "id": "heatingOil",
     "label": "Heating Oil",
-    "value": "3.1352",
-    "change": "+0.26%",
+    "value": "3.1335",
+    "change": "+0.2%",
     "trend": "Bullish",
     "severity": "Low"
   },
   "spread": {
     "id": "spread",
     "label": "WTI-Brent Spread",
-    "value": "-3.61",
-    "change": "-4.61%",
+    "value": "-3.47",
+    "change": "-4.43%",
     "trend": "Brent Premium",
     "severity": "High"
   },
@@ -52,16 +52,16 @@
     {
       "id": "wti",
       "label": "WTI",
-      "value": "74.78",
-      "change": "-0.65%",
+      "value": "74.85",
+      "change": "-0.56%",
       "trend": "Bearish",
       "severity": "Low"
     },
     {
       "id": "brent",
       "label": "Brent",
-      "value": "78.39",
-      "change": "-0.72%",
+      "value": "78.32",
+      "change": "-0.81%",
       "trend": "Bearish",
       "severity": "Low"
     },
@@ -85,16 +85,16 @@
     {
       "id": "heatingOil",
       "label": "Heating Oil",
-      "value": "3.1352",
-      "change": "+0.26%",
+      "value": "3.1335",
+      "change": "+0.2%",
       "trend": "Bullish",
       "severity": "Low"
     },
     {
       "id": "spread",
       "label": "WTI-Brent Spread",
-      "value": "-3.61",
-      "change": "-4.61%",
+      "value": "-3.47",
+      "change": "-4.43%",
       "trend": "Brent Premium",
       "severity": "High"
     }
@@ -103,7 +103,7 @@
     {
       "id": "wti-alert",
       "title": "WTI Price Alert",
-      "value": 74.78,
+      "value": 74.85,
       "severity": "Medium",
       "status": "Approaching upper resistance",
       "message": "Approaching upper resistance",
@@ -132,27 +132,6 @@
     }
   ],
   "priceHistory": [
-    {
-      "t": "04:42 AM",
-      "name": "04:42 AM",
-      "value": 75.01,
-      "brent": 78.61,
-      "ho": 3.14
-    },
-    {
-      "t": "04:43 AM",
-      "name": "04:43 AM",
-      "value": 74.98,
-      "brent": 0,
-      "ho": 0
-    },
-    {
-      "t": "04:44 AM",
-      "name": "04:44 AM",
-      "value": 74.99,
-      "brent": 0,
-      "ho": 0
-    },
     {
       "t": "04:45 AM",
       "name": "04:45 AM",
@@ -294,9 +273,30 @@
       "ho": 3.14
     },
     {
-      "t": "05:04 AM",
-      "name": "05:04 AM",
-      "value": 74.78,
+      "t": "05:05 AM",
+      "name": "05:05 AM",
+      "value": 74.72,
+      "brent": 78.32,
+      "ho": 3.13
+    },
+    {
+      "t": "05:06 AM",
+      "name": "05:06 AM",
+      "value": 74.84,
+      "brent": 0,
+      "ho": 0
+    },
+    {
+      "t": "05:07 AM",
+      "name": "05:07 AM",
+      "value": 74.85,
+      "brent": 0,
+      "ho": 0
+    },
+    {
+      "t": "05:07 AM",
+      "name": "05:07 AM",
+      "value": 74.84,
       "brent": null,
       "ho": null
     }
@@ -491,7 +491,7 @@
     "scenarioEngine": "A standard deviation shock would push VaR to 6.8% under current correlations."
   },
   "riskFactors": [
-    "WTI -0.65% signals easing crude tension",
+    "WTI -0.56% signals easing crude tension",
     "DXY at 99.5 remains the macro swing factor",
     "Inventory draw dynamics continue to define prompt balance"
   ],
@@ -546,16 +546,16 @@
     "Elevated OVX indicates heightened market stress."
   ],
   "analyticsInputs": {
-    "WB_C1": -3.61,
+    "WB_C1": -3.47,
     "CL_VOL20": 53.1,
-    "HO_CL_DIFF": -71.6448,
+    "HO_CL_DIFF": -71.7165,
     "INVENTORY_DRAW": -7.2,
-    "WTI_PRICE": 74.78,
-    "BRENT_PRICE": 78.39,
+    "WTI_PRICE": 74.85,
+    "BRENT_PRICE": 78.32,
     "DXY": 99.5
   },
   "_metadata": {
-    "timestamp": "2026-06-17T05:15:01.401207+00:00",
+    "timestamp": "2026-06-17T05:18:02.094110+00:00",
     "source": "live-backend"
   }
 }
