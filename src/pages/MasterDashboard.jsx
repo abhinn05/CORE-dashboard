@@ -42,6 +42,13 @@ export default function MasterDashboard() {
   signals = [],
 } = useSignalLog();
 
+  const instrumentNames = {
+    CL_M1M2: "WTI M1-M2 Spread",
+    WB_C1: "WTI-Brent Spread",
+    HO_CL_DIFF: "Heating Oil Crack Spread",
+    LGO_LCO_DIFF: "Gasoil-Brent Crack",
+  };
+
 
   const latestNews = useMemo(
     () => (liveNews ?? []).slice(0, 5),
@@ -223,8 +230,14 @@ export default function MasterDashboard() {
                   Change
                 </p>
 
-                <p className="text-xl font-bold text-red-400">
-                  {effectiveMarket.wti?.change ?? "N/A"}
+                <p
+                    className={`text-xl font-bold ${
+                        parseFloat(effectiveMarket.wti?.change) >= 0
+                            ? "text-green-400"
+                            : "text-red-400"
+                    }`}
+                >
+                    {effectiveMarket.wti?.change ?? "N/A"}
                 </p>
               </div>
 
@@ -322,7 +335,11 @@ export default function MasterDashboard() {
                   className="px-5 py-4 min-h-[95px]"
                 >
                   <p className="text-3xl font-black text-white">
-                    {inventory.value}
+                    {
+                    typeof inventory.value==="number"
+                    ? `${inventory.value.toFixed(1)} Mbbl`
+                    : inventory.value
+                    }
                   </p>
 
                   <p className="mt-3 text-sm text-gray-400">
@@ -528,33 +545,62 @@ export default function MasterDashboard() {
 
                 <Metric
                   label="Instrument"
-                  value={coreSignal?.instrument ?? coreSignal?.target ?? "N/A"}
+                  value={
+                    instrumentNames[
+                      coreSignal?.instrument ??
+                      coreSignal?.target
+                    ] ??
+                    coreSignal?.instrument ??
+                    coreSignal?.target ??
+                    "--"
+                  }
                 />
 
                 <Metric
                   label="Regime"
-                  value={coreSignal?.regime ?? "N/A"}
+                  value={
+                    coreSignal?.regime
+                      ?.replaceAll("_", " ")
+                      .replace("HIGH VOL", "High Vol")
+                      .replace("MED VOL", "Medium Vol")
+                      .replace("LOW VOL", "Low Vol") ??
+                    "--"
+                  }
                 />
 
                 <Metric
                   label="Confidence"
-                  value={
-                    typeof coreSignal?.confidence === "number"
-                      ? `${coreSignal.confidence}%`
-                      : coreSignal?.confidence ?? "N/A"
+                  value={coreSignal?.confidence ?? "--"}
+                  color={
+                    coreSignal?.confidence === "High"
+                      ? "text-green-400"
+                      : coreSignal?.confidence === "Medium"
+                      ? "text-yellow-400"
+                      : "text-red-400"
                   }
-                  color="text-cyan-400"
                 />
 
                 <Metric
-                  label="Entry"
-                  value={coreSignal?.entry_price ?? "N/A"}
+                  label="Entry Spread"
+                  value={
+                    coreSignal?.entry_price != null
+                      ? Number(coreSignal.entry_price).toFixed(2)
+                      : "--"
+                  }
                 />
 
                 <Metric
                   label="Status"
-                  value={coreSignal?.status ?? "N/A"}
-                  color="text-green-400"
+                  value={coreSignal?.status ?? "--"}
+                  color={
+                      coreSignal?.status === "OPEN"
+                          ? "text-green-400"
+                          : coreSignal?.status === "CLOSED"
+                          ? "text-gray-400"
+                          : coreSignal?.status === "STOPPED"
+                          ? "text-red-400"
+                          : "text-cyan-400"
+                  }
                 />
 
               </div>
@@ -570,7 +616,11 @@ export default function MasterDashboard() {
 
                 <div className="space-y-6">
 
-                  {(effectiveMarket.signalExplanation ?? []).map(
+                  {[
+                      coreSignal?.rationale,
+                      ...(effectiveMarket.signalExplanation ?? [])
+                  ]
+                  .filter(Boolean).map(
 
                     (reason, idx) => (
 
@@ -610,28 +660,40 @@ export default function MasterDashboard() {
 
               <div className="rounded-xl border border-white/5 bg-white/[0.03] p-4">
                 <p className="text-[10px] uppercase tracking-[0.2em] text-gray-500">
-                  Entry
+                  Entry Spread
                 </p>
                 <p className="mt-2 text-2xl font-bold text-white">
-                  {coreSignal?.entry_price ?? "N/A"}
+                  {
+                    coreSignal?.entry_price != null
+                    ? Number(coreSignal.entry_price).toFixed(2)
+                    : "--"
+                    }
                 </p>
               </div>
 
               <div className="rounded-xl border border-green-500/10 bg-green-500/[0.05] p-4">
                 <p className="text-[10px] uppercase tracking-[0.2em] text-green-300">
-                  Target
+                  Target Spread
                 </p>
                 <p className="mt-2 text-2xl font-bold text-green-400">
-                  {coreSignal?.target_price ?? "N/A"}
+                  {
+                    coreSignal?.target_price != null
+                      ? Number(coreSignal.target_price).toFixed(2)
+                      : "--"
+                  }
                 </p>
               </div>
 
               <div className="rounded-xl border border-red-500/10 bg-red-500/[0.05] p-4">
                 <p className="text-[10px] uppercase tracking-[0.2em] text-red-300">
-                  Stop
+                  Stop Spread
                 </p>
                 <p className="mt-2 text-2xl font-bold text-red-400">
-                  {coreSignal?.stop_loss ?? "N/A"}
+                  {
+                    coreSignal?.stop_loss != null
+                      ? Number(coreSignal.stop_loss).toFixed(2)
+                      : "--"
+                  }
                 </p>
               </div>
 
@@ -640,7 +702,11 @@ export default function MasterDashboard() {
                   Risk / Reward
                 </p>
                 <p className="mt-2 text-2xl font-bold text-cyan-300">
-                  {coreSignal?.risk_reward ?? "N/A"}
+                  {
+                    coreSignal?.risk_reward != null
+                    ? Number(coreSignal.risk_reward).toFixed(2)
+                    : "--"
+                    }
                 </p>
               </div>
 
@@ -658,7 +724,11 @@ export default function MasterDashboard() {
                   Expected Return
                 </p>
                 <p className="mt-2 text-2xl font-bold text-emerald-400">
-                  {coreSignal?.expected_return ?? "N/A"}
+                  {
+                    coreSignal?.expected_return != null
+                    ? Number(coreSignal.expected_return).toFixed(2)
+                    : "--"
+                    }
                 </p>
               </div>
 

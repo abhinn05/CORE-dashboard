@@ -7,13 +7,13 @@ export default function MarketStatusBar({
   risk,
   lastUpdated,
 }) {
-  const formattedTime = lastUpdated
-  ? new Date(lastUpdated).toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-    })
-  : "N/A";
+  const formattedTime = new Date(
+    lastUpdated ?? Date.now()
+  ).toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+  });
 
   return (
     <div className="mb-6 rounded-3xl border border-cyan-500/10 bg-gradient-to-r from-cyan-500/5 via-blue-500/5 to-transparent p-5">
@@ -23,7 +23,15 @@ export default function MarketStatusBar({
         <StatusItem
           icon={<Activity size={16} />}
           label="REGIME"
-          value={regime ?? "N/A"}
+          value={
+            regime
+              ? regime
+                  .replaceAll("_", " ")
+                  .replace("HIGH VOL", "High Vol")
+                  .replace("MED VOL", "Medium Vol")
+                  .replace("LOW VOL", "Low Vol")
+              : "N/A"
+          }
           color="text-cyan-400"
         />
 
@@ -31,7 +39,13 @@ export default function MarketStatusBar({
           icon={<TrendingDown size={16} />}
           label="SIGNAL"
           value={signal ?? "N/A"}
-          color="text-red-400"
+          color={
+            signal === "BUY"
+              ? "text-green-400"
+              : signal === "SELL"
+              ? "text-red-400"
+              : "text-gray-300"
+          }
         />
 
         <StatusItem
