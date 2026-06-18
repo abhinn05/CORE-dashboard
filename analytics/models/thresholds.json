@@ -1,3 +1,8 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:4c7598a448b13d3a80a358be1f4da90def6a24e2d95a9276edb753ffddb1428a
-size 122
+{
+    "CL_VOL20": {
+        "low": 0.24808999573144463,
+        "high": 0.3469455969200203
+    },
+    "WB_C1_median": -4.355179794520548,
+    "HO_CL_DIFF_median": -75.56267692307692
+}

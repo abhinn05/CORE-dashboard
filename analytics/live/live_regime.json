@@ -1,14 +1,15 @@
 {
-  "timestamp": "2026-06-17T05:04:01.554552+00:00",
-  "regime": "HIGH_VOL_LOOSE_WB_DRAW",
+  "timestamp": "2026-06-18T05:42:01.544017+00:00",
+  "regime": "BACKWARDATION_HIGH_VOL_STRONG_PRODUCTS_TIGHT_WB",
   "drivers": {
+    "curve": "BACKWARDATION",
     "volatility": "HIGH_VOL",
-    "wb": "LOOSE_WB",
-    "inventory": "DRAW"
+    "products": "STRONG_PRODUCTS",
+    "wb": "TIGHT_WB"
   },
   "values": {
-    "CL_VOL20": 53.1,
-    "WB_C1": -3.59,
-    "INVENTORY_DRAW": -7.2
+    "CL_VOL20": 53.65,
+    "WB_C1": -3.66,
+    "HO_CL_DIFF": -70.8742
   }
 }

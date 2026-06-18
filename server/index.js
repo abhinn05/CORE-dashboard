@@ -1588,6 +1588,8 @@ app.get('/api/market', async (req, res) => {
 
     };
 
+    data.lastUpdated = new Date().toISOString();
+
     return res.json({ data, ts: Date.now(), source: 'live-backend' });
   } catch (err) {
     console.error('market api error', err);
@@ -1693,7 +1695,7 @@ app.get('/api/opportunities', (req, res) => {
   try {
     const filePath = path.join(
       __dirname,
-      '../analytics/data/processed/opportunities.json'
+      '../analytics/live/live_opportunities.json'
     );
 
     const data = JSON.parse(

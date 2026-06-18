@@ -1,16 +1,1 @@
-[
-  {
-    "timestamp": "2026-06-17T05:04:01.554552+00:00",
-    "target": "WB_C1",
-    "regime": "HIGH_VOL_LOOSE_WB_DRAW",
-    "actual": -3.59,
-    "expected": -4.09,
-    "residual": 0.5,
-    "zscore": 1.8,
-    "direction": "SELL",
-    "opportunity_score": 1.17,
-    "r2": 0.6457,
-    "confidence": "Medium",
-    "rationale": "Demo signal generated due to lack of validated models for the current regime."
-  }
-]
+[]

@@ -76,6 +76,15 @@ print("Creating WTI-Brent regimes...")
 
 wb_median = df["WB_C1"].median()
 
+thresholds = {
+    "CL_VOL20": {
+        "low": float(low),
+        "high": float(high)
+    },
+    "WB_C1_median": float(wb_median),
+    "HO_CL_DIFF_median": float(product_median)
+}
+
 df["WB_REGIME"] = np.where(
     df["WB_C1"] >= wb_median,
     "TIGHT_WB",
@@ -150,11 +159,27 @@ df.to_csv(REGIME_CSV)
 counts.to_csv(COUNTS_CSV)
 
 
+THRESHOLD_FILE = (
+    BASE_DIR
+    / "models"
+    / "thresholds.json"
+)
+
+with open(THRESHOLD_FILE, "w") as f:
+    import json
+    json.dump(
+        thresholds,
+        f,
+        indent=4,
+    )
+
+
 print("\nSaved:")
 
 print("regime_database.parquet")
 print("regime_database.csv")
 print("regime_counts.csv")
+print("thresholds.json")
 
 print("\nFinal shape:")
 

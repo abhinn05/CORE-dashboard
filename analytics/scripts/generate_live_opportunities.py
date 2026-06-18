@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 import csv
 import uuid
-
+import math
 
 BASE_DIR = Path(__file__).parent.parent
 
@@ -79,13 +79,17 @@ def append_signal(signal):
 
             "OPEN",
 
-            signal["actual"],
+            signal.get("entry_price", ""),
 
-            "",
+            signal.get("target_price", ""),
 
-            "",
+            signal.get("stop_loss", ""),
 
-            "",
+            signal.get("position_size", ""),
+
+            signal.get("risk_reward", ""),
+
+            signal.get("expected_return", ""),
 
         ])
 
@@ -153,25 +157,19 @@ def main():
 
         target = model["target"]
 
-        actual = features.get(target)
+        FEATURE_MAP = {
+            "WB_C1": "WB_C1",
+            "CL_M1M2": "CL_M1M2",
+            "LGO_LCO_DIFF": "HO_CL_DIFF",
+        }
 
-        if actual is None:
+        feature_name = FEATURE_MAP.get(target, target)
 
-            #
-            # Use market values for targets
-            #
+        actual = features.get(feature_name)
 
-            if target == "WB_C1":
-
-                actual = features.get("WB_C1")
-
-            elif target == "CL_M1M2":
-
-                actual = features.get("WB_C1")
-
-            elif target == "LGO_LCO_DIFF":
-
-                actual = features.get("HO_CL_DIFF")
+        print(f"\nTarget: {target}")
+        print(f"Feature used: {feature_name}")
+        print(f"Actual: {actual}")
 
 
         if actual is None:
@@ -183,6 +181,8 @@ def main():
         for feature, coef in model[
             "coefficients"
         ].items():
+            
+            print(feature, features.get(feature))
 
             value = features.get(feature)
 
@@ -204,12 +204,17 @@ def main():
             "residual_std"
         ]
 
-        zscore = (
+        if residual_std <= 0:
+            continue
+        
 
-            residual
-            / residual_std
 
-        )
+        zscore = residual / residual_std
+
+        print(f"Expected: {expected}")
+        print(f"Residual: {residual}")
+        print(f"Residual Std: {residual_std}")
+        print(f"Z-score: {zscore}")
 
         score = (
 
@@ -231,8 +236,89 @@ def main():
             direction = "BUY"
 
         if direction is None:
-
             continue
+
+       #
+        # Institutional execution metrics
+        #
+
+        entry_price = round(actual, 4)
+
+        target_price = round(expected, 4)
+
+        # Residual standard deviation becomes the risk estimate
+        risk_distance = max(
+            residual_std,
+            min(
+                abs(residual) * 0.5,
+                residual_std * 3,
+            ),
+        )
+
+        if direction == "BUY":
+
+            stop_loss = round(
+                entry_price - risk_distance,
+                4,
+            )
+
+        else:
+
+            stop_loss = round(
+                entry_price + risk_distance,
+                4,
+            )
+
+        price_based_targets = {
+            "WTI",
+            "BRENT",
+            "CL",
+        }
+
+        if target in price_based_targets:
+
+            if direction == "BUY":
+
+                expected_return = (
+                    (target_price - entry_price)
+                    / entry_price
+                ) * 100
+
+            else:
+
+                expected_return = (
+                    (entry_price - target_price)
+                    / entry_price
+                ) * 100
+
+        else:
+
+            expected_return = round(
+                target_price - entry_price,
+                4,
+            ) 
+
+        expected_return = round(
+            expected_return,
+            2,
+        )
+
+        risk_reward = round(
+            abs(target_price - entry_price)
+            /
+            max(abs(stop_loss - entry_price), 1e-8),
+            2,
+        )
+
+        position_size = max(
+            0.5,
+            min(
+                5.0,
+                math.log1p(abs(zscore)) * model["r2"] * 2
+            )
+        )
+
+        position_size = f"{position_size:.1f}%"
 
         opportunities.append({
 
@@ -268,6 +354,30 @@ def main():
 
                 direction,
 
+            "entry_price":
+
+                entry_price,
+
+            "target_price":
+
+                target_price,
+
+            "stop_loss":
+
+                stop_loss,
+
+            "position_size":
+
+                position_size,
+
+            "risk_reward":
+
+                risk_reward,
+
+            "expected_return":
+
+                expected_return,
+
             "opportunity_score":
 
                 round(score, 2),
@@ -293,81 +403,6 @@ def main():
             opportunities[-1]
         )
 
-    #
-# Demo fallback signal
-        #
-
-    if len(opportunities) == 0:
-
-        signal = {
-
-            "timestamp":
-
-                regime_data["timestamp"],
-
-            "target":
-
-                "WB_C1",
-
-            "regime":
-
-                current_regime,
-
-            "actual":
-
-                round(
-                    features["WB_C1"],
-                    4,
-                ),
-
-            "expected":
-
-                round(
-                    features["WB_C1"] - 0.5,
-                    4,
-                ),
-
-            "residual":
-
-                0.5,
-
-            "zscore":
-
-                1.8,
-
-            "direction":
-
-                "SELL",
-
-            "opportunity_score":
-
-                1.17,
-
-            "r2":
-
-                0.6457,
-
-            "confidence":
-
-                "Medium",
-
-            "rationale":
-
-                "Demo signal generated due to "
-                "lack of validated models "
-                "for the current regime.",
-
-        }
-
-        opportunities.append(signal)
-
-        append_signal(signal)
-
-        print(
-            "No validated live signals. "
-            "Generated demo signal."
-        )
-        
     with open(
         OUTPUT_FILE,
         "w",
@@ -379,22 +414,7 @@ def main():
             indent=2,
         )
 
-    print()
-
-    print(
-        f"Generated "
-        f"{len(opportunities)} "
-        f"opportunities"
-    )
-
-    print()
-
-    print(
-        json.dumps(
-            opportunities,
-            indent=2,
-        )
-    )
+    print(f"Generated {len(opportunities)} opportunities")
 
 
 if __name__ == "__main__":

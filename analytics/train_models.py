@@ -25,6 +25,23 @@ OUTPUT = (
 print("Loading regime database...")
 
 df = pd.read_parquet(INPUT)
+print(df[[
+    "WB_C1",
+    "CL_M1M2",
+    "HO_CL_DIFF",
+    "CL_VOL20"
+]].describe())
+
+print("\nNaN counts\n")
+
+print(df[[
+    "WB_C1",
+    "CL_M1M2",
+    "HO_CL_DIFF",
+    "CL_VOL20"
+]].isna().sum())
+
+print(df.columns.tolist())
 
 results = []
 
