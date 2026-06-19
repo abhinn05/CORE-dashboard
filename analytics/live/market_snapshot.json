@@ -2,24 +2,24 @@
   "wti": {
     "id": "wti",
     "label": "WTI",
-    "value": "74.18",
-    "change": "-2.41%",
+    "value": "73.99",
+    "change": "-2.66%",
     "trend": "Bearish",
     "severity": "High"
   },
   "brent": {
     "id": "brent",
     "label": "Brent",
-    "value": "77.8",
-    "change": "-2.2%",
+    "value": "78.02",
+    "change": "-1.92%",
     "trend": "Bearish",
-    "severity": "High"
+    "severity": "Medium"
   },
   "dxy": {
     "id": "dxy",
     "label": "DXY",
-    "value": "100.255",
-    "change": "+0.17%",
+    "value": "100.566",
+    "change": "+0.48%",
     "trend": "Bullish",
     "severity": "Low"
   },
@@ -35,16 +35,16 @@
   "heatingOil": {
     "id": "heatingOil",
     "label": "Heating Oil",
-    "value": "3.079",
-    "change": "-2.06%",
+    "value": "3.0521",
+    "change": "-2.92%",
     "trend": "Bearish",
     "severity": "High"
   },
   "spread": {
     "id": "spread",
     "label": "WTI-Brent Spread",
-    "value": "-3.62",
-    "change": "-4.65%",
+    "value": "-4.03",
+    "change": "-5.17%",
     "trend": "Brent Premium",
     "severity": "High"
   },
@@ -52,24 +52,24 @@
     {
       "id": "wti",
       "label": "WTI",
-      "value": "74.18",
-      "change": "-2.41%",
+      "value": "73.99",
+      "change": "-2.66%",
       "trend": "Bearish",
       "severity": "High"
     },
     {
       "id": "brent",
       "label": "Brent",
-      "value": "77.8",
-      "change": "-2.2%",
+      "value": "78.02",
+      "change": "-1.92%",
       "trend": "Bearish",
-      "severity": "High"
+      "severity": "Medium"
     },
     {
       "id": "dxy",
       "label": "DXY",
-      "value": "100.255",
-      "change": "+0.17%",
+      "value": "100.566",
+      "change": "+0.48%",
       "trend": "Bullish",
       "severity": "Low"
     },
@@ -85,16 +85,16 @@
     {
       "id": "heatingOil",
       "label": "Heating Oil",
-      "value": "3.079",
-      "change": "-2.06%",
+      "value": "3.0521",
+      "change": "-2.92%",
       "trend": "Bearish",
       "severity": "High"
     },
     {
       "id": "spread",
       "label": "WTI-Brent Spread",
-      "value": "-3.62",
-      "change": "-4.65%",
+      "value": "-4.03",
+      "change": "-5.17%",
       "trend": "Brent Premium",
       "severity": "High"
     }
@@ -103,7 +103,7 @@
     {
       "id": "wti-alert",
       "title": "WTI Price Alert",
-      "value": 74.18,
+      "value": 73.99,
       "severity": "Medium",
       "status": "Approaching upper resistance",
       "message": "Approaching upper resistance",
@@ -133,171 +133,171 @@
   ],
   "priceHistory": [
     {
-      "t": "06:18 AM",
-      "name": "06:18 AM",
-      "value": 73.52,
-      "brent": 77.22,
-      "ho": 0
+      "t": "09:19 AM",
+      "name": "09:19 AM",
+      "value": 73.72,
+      "brent": 77.54,
+      "ho": 3.04
     },
     {
-      "t": "06:19 AM",
-      "name": "06:19 AM",
-      "value": 73.58,
-      "brent": 0,
-      "ho": 3.06
+      "t": "09:20 AM",
+      "name": "09:20 AM",
+      "value": 73.8,
+      "brent": 77.62,
+      "ho": 3.04
     },
     {
-      "t": "06:20 AM",
-      "name": "06:20 AM",
-      "value": 73.62,
-      "brent": 0,
-      "ho": 3.06
+      "t": "09:21 AM",
+      "name": "09:21 AM",
+      "value": 73.87,
+      "brent": 77.69,
+      "ho": 3.04
     },
     {
-      "t": "06:21 AM",
-      "name": "06:21 AM",
-      "value": 73.57,
-      "brent": 77.29,
-      "ho": 0
-    },
-    {
-      "t": "06:22 AM",
-      "name": "06:22 AM",
-      "value": 73.51,
-      "brent": 0,
-      "ho": 0
-    },
-    {
-      "t": "06:23 AM",
-      "name": "06:23 AM",
-      "value": 73.53,
-      "brent": 77.21,
-      "ho": 3.06
-    },
-    {
-      "t": "06:24 AM",
-      "name": "06:24 AM",
-      "value": 73.48,
-      "brent": 77.2,
-      "ho": 0
-    },
-    {
-      "t": "06:25 AM",
-      "name": "06:25 AM",
-      "value": 73.55,
-      "brent": 77.26,
-      "ho": 3.06
-    },
-    {
-      "t": "06:26 AM",
-      "name": "06:26 AM",
-      "value": 73.61,
-      "brent": 0,
-      "ho": 3.06
-    },
-    {
-      "t": "06:27 AM",
-      "name": "06:27 AM",
-      "value": 73.65,
-      "brent": 0,
-      "ho": 0
-    },
-    {
-      "t": "06:28 AM",
-      "name": "06:28 AM",
-      "value": 73.66,
-      "brent": 77.34,
-      "ho": 3.06
-    },
-    {
-      "t": "06:29 AM",
-      "name": "06:29 AM",
-      "value": 73.55,
-      "brent": 77.25,
-      "ho": 0
-    },
-    {
-      "t": "06:30 AM",
-      "name": "06:30 AM",
-      "value": 73.51,
-      "brent": 77.19,
+      "t": "09:22 AM",
+      "name": "09:22 AM",
+      "value": 73.96,
+      "brent": 77.79,
       "ho": 3.05
     },
     {
-      "t": "06:31 AM",
-      "name": "06:31 AM",
-      "value": 73.59,
-      "brent": 77.28,
+      "t": "09:23 AM",
+      "name": "09:23 AM",
+      "value": 74.11,
+      "brent": 77.97,
+      "ho": 3.05
+    },
+    {
+      "t": "09:24 AM",
+      "name": "09:24 AM",
+      "value": 74.09,
+      "brent": 77.96,
+      "ho": 3.05
+    },
+    {
+      "t": "09:25 AM",
+      "name": "09:25 AM",
+      "value": 74.08,
+      "brent": 77.91,
+      "ho": 3.05
+    },
+    {
+      "t": "09:26 AM",
+      "name": "09:26 AM",
+      "value": 74.07,
+      "brent": 77.95,
+      "ho": 3.05
+    },
+    {
+      "t": "09:27 AM",
+      "name": "09:27 AM",
+      "value": 74.1,
+      "brent": 77.96,
+      "ho": 3.05
+    },
+    {
+      "t": "09:28 AM",
+      "name": "09:28 AM",
+      "value": 74.07,
+      "brent": 77.91,
+      "ho": 3.05
+    },
+    {
+      "t": "09:29 AM",
+      "name": "09:29 AM",
+      "value": 74.09,
+      "brent": 77.94,
+      "ho": 3.05
+    },
+    {
+      "t": "09:30 AM",
+      "name": "09:30 AM",
+      "value": 74.18,
+      "brent": 78.02,
       "ho": 3.06
     },
     {
-      "t": "06:32 AM",
-      "name": "06:32 AM",
-      "value": 73.69,
-      "brent": 77.4,
+      "t": "09:31 AM",
+      "name": "09:31 AM",
+      "value": 74.25,
+      "brent": 78.11,
       "ho": 3.06
     },
     {
-      "t": "06:33 AM",
-      "name": "06:33 AM",
-      "value": 73.71,
-      "brent": 77.37,
+      "t": "09:32 AM",
+      "name": "09:32 AM",
+      "value": 74.24,
+      "brent": 78.1,
       "ho": 3.06
     },
     {
-      "t": "06:34 AM",
-      "name": "06:34 AM",
-      "value": 73.78,
-      "brent": 77.45,
-      "ho": 3.06
+      "t": "09:33 AM",
+      "name": "09:33 AM",
+      "value": 74.12,
+      "brent": 78.03,
+      "ho": 3.05
     },
     {
-      "t": "06:35 AM",
-      "name": "06:35 AM",
-      "value": 73.93,
-      "brent": 77.58,
-      "ho": 3.06
-    },
-    {
-      "t": "06:36 AM",
-      "name": "06:36 AM",
-      "value": 73.99,
-      "brent": 77.7,
-      "ho": 3.07
-    },
-    {
-      "t": "06:37 AM",
-      "name": "06:37 AM",
-      "value": 73.99,
-      "brent": 77.63,
-      "ho": 3.07
-    },
-    {
-      "t": "06:38 AM",
-      "name": "06:38 AM",
+      "t": "09:34 AM",
+      "name": "09:34 AM",
       "value": 74.13,
-      "brent": 77.78,
-      "ho": 3.08
+      "brent": 78.03,
+      "ho": 0
     },
     {
-      "t": "06:39 AM",
-      "name": "06:39 AM",
-      "value": 74.06,
-      "brent": 77.71,
-      "ho": 3.08
+      "t": "09:35 AM",
+      "name": "09:35 AM",
+      "value": 74.1,
+      "brent": 78,
+      "ho": 3.05
     },
     {
-      "t": "06:40 AM",
-      "name": "06:40 AM",
-      "value": 74.18,
-      "brent": 77.83,
-      "ho": 3.08
+      "t": "09:36 AM",
+      "name": "09:36 AM",
+      "value": 74.15,
+      "brent": 78.06,
+      "ho": 3.05
     },
     {
-      "t": "06:40 AM",
-      "name": "06:40 AM",
-      "value": 74.18,
-      "brent": 77.83,
+      "t": "09:37 AM",
+      "name": "09:37 AM",
+      "value": 74.12,
+      "brent": 0,
+      "ho": 3.05
+    },
+    {
+      "t": "09:38 AM",
+      "name": "09:38 AM",
+      "value": 74.03,
+      "brent": 78,
+      "ho": 3.05
+    },
+    {
+      "t": "09:39 AM",
+      "name": "09:39 AM",
+      "value": 74.03,
+      "brent": 77.96,
+      "ho": 3.05
+    },
+    {
+      "t": "09:40 AM",
+      "name": "09:40 AM",
+      "value": 74.05,
+      "brent": 78.01,
+      "ho": 3.05
+    },
+    {
+      "t": "09:41 AM",
+      "name": "09:41 AM",
+      "value": 73.99,
+      "brent": 78.02,
+      "ho": 3.05
+    },
+    {
+      "t": "09:41 AM",
+      "name": "09:41 AM",
+      "value": 74,
+      "brent": null,
       "ho": null
     }
   ],
@@ -322,8 +322,8 @@
     "accent": "High"
   },
   "macro": {
-    "value": "Neutral",
-    "detail": "DXY at 100.25 is a key driver.",
+    "value": "Bearish",
+    "detail": "DXY at 100.57 is a key driver.",
     "accent": "Medium"
   },
   "geopolitical": {
@@ -401,7 +401,7 @@
     "bearishDrivers": [
       "Inventory surprise risk",
       "Elevated volatility premiums",
-      "Macro demand stability"
+      "Macro demand headwinds"
     ],
     "suggestedTrade": "Lean long WTI via front-month futures with defined risk."
   },
@@ -422,7 +422,7 @@
       {
         "title": "Macro Shock",
         "score": "Stable",
-        "detail": "DXY moves (+0.17%%) drive macro shock probability.",
+        "detail": "DXY moves (+0.48%%) drive macro shock probability.",
         "color": "text-green-400"
       },
       {
@@ -491,8 +491,8 @@
     "scenarioEngine": "A standard deviation shock would push VaR to 6.9% under current correlations."
   },
   "riskFactors": [
-    "WTI -2.41% signals easing crude tension",
-    "DXY at 100.255 remains the macro swing factor",
+    "WTI -2.66% signals easing crude tension",
+    "DXY at 100.566 remains the macro swing factor",
     "Inventory draw dynamics continue to define prompt balance"
   ],
   "marketMovers": [
@@ -515,7 +515,7 @@
   ],
   "marketStats": {
     "volume": {
-      "value": "0.02M",
+      "value": "0.04M",
       "change": "+15.2%"
     },
     "openInterest": {
@@ -546,17 +546,17 @@
     "Elevated OVX indicates heightened market stress."
   ],
   "analyticsInputs": {
-    "WB_C1": -3.62,
+    "WB_C1": -4.03,
     "CL_VOL20": 53.65,
-    "HO_CL_DIFF": -71.10100000000001,
+    "HO_CL_DIFF": -70.9379,
     "INVENTORY_DRAW": -8.3,
-    "WTI_PRICE": 74.18,
-    "BRENT_PRICE": 77.8,
-    "DXY": 100.255
+    "WTI_PRICE": 73.99,
+    "BRENT_PRICE": 78.02,
+    "DXY": 100.566
   },
-  "lastUpdated": "2026-06-18T06:51:00.880Z",
+  "lastUpdated": "2026-06-18T09:52:01.775Z",
   "_metadata": {
-    "timestamp": "2026-06-18T06:51:00.881538+00:00",
+    "timestamp": "2026-06-18T09:52:01.776994+00:00",
     "source": "live-backend"
   }
 }
