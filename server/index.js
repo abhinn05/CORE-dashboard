@@ -287,10 +287,95 @@ function scoreNews(text) {
     'slowdown', 'recession', 'lower', 'drop', 'fall', 'bearish', 'strong dollar',
   ].filter((word) => value.includes(word)).length;
   const score = bullishHits - bearishHits;
-  return {
-    sentiment: score >= 0 ? 'Bullish' : 'Bearish',
-    impact: clamp(round(5 + Math.abs(score) * 0.9 + Math.min(value.length / 220, 2), 1), 5, 9.5),
-  };
+  const impact = clamp(
+        round(
+            5 + Math.abs(score) * 0.9 + Math.min(value.length / 220, 2),
+            1
+        ),
+        5,
+        9.5
+    );
+
+    let importance;
+
+    if (impact >= 8.5) {
+        importance = "Critical";
+    } else if (impact >= 7) {
+        importance = "High";
+    } else if (impact >= 6) {
+        importance = "Medium";
+    } else {
+        importance = "Low";
+    }
+
+    return {
+        sentiment: score >= 0 ? "Bullish" : "Bearish",
+        impact,
+        importance,
+    };
+}
+
+function relativeTime(date) {
+
+  if (!date) return "Unknown";
+
+  const seconds =
+    Math.floor((Date.now() - new Date(date)) / 1000);
+
+  if (seconds < 60)
+    return `${seconds}s ago`;
+
+  if (seconds < 3600)
+    return `${Math.floor(seconds / 60)} min ago`;
+
+  if (seconds < 86400)
+    return `${Math.floor(seconds / 3600)} hr ago`;
+
+  return `${Math.floor(seconds / 86400)} day ago`;
+
+}
+
+function extractTags(text) {
+
+    const value = text.toLowerCase();
+
+    const tags = [];
+
+    if (value.includes("wti"))
+        tags.push("WTI");
+
+    if (value.includes("brent"))
+        tags.push("Brent");
+
+    if (value.includes("opec"))
+        tags.push("OPEC");
+
+    if (value.includes("iran"))
+        tags.push("Iran");
+
+    if (value.includes("russia"))
+        tags.push("Russia");
+
+    if (value.includes("inventory"))
+        tags.push("Inventory");
+
+    if (value.includes("refinery"))
+        tags.push("Refining");
+
+    if (value.includes("shipping"))
+        tags.push("Shipping");
+
+    if (value.includes("china"))
+        tags.push("China");
+
+    if (value.includes("fed"))
+        tags.push("Fed");
+
+    if (value.includes("dollar"))
+        tags.push("USD");
+
+    return [...new Set(tags)];
+
 }
 
 function latest(series) {
@@ -529,7 +614,285 @@ async function fetchLiveNews() {
     throw new Error(json.message || `NewsAPI request failed: ${response.status}`);
   }
 
-  return normalizeFeed('news', json);
+  const headlines = normalizeFeed("news", json);
+
+  // analytics
+
+  const bullish = headlines.filter(
+      h => h.sentiment === "Bullish"
+  ).length;
+
+  const bearish = headlines.filter(
+      h => h.sentiment === "Bearish"
+  ).length;
+
+  const neutral =
+      headlines.length - bullish - bearish;
+
+  const bullishPct =
+      headlines.length
+          ? Math.round(
+              bullish / headlines.length * 100
+            )
+          : 0;
+
+  const bearishPct =
+      headlines.length
+          ? Math.round(
+              bearish / headlines.length * 100
+            )
+          : 0;
+
+  const neutralPct =
+      headlines.length
+          ? 100 - bullishPct - bearishPct
+          : 0;
+
+  const themes = {};
+
+  headlines.forEach(article => {
+
+      article.tags?.forEach(tag => {
+
+          themes[tag] = (themes[tag] || 0) + 1;
+
+      });
+
+  });
+
+  const topThemes = Object.entries(themes)
+
+  .sort((a,b)=>b[1]-a[1])
+
+  .slice(0,6)
+
+  .map(([name,count])=>({
+
+      name,
+
+      count
+
+  }));
+
+  const dominantTheme = topThemes[0]?.name ?? "Market";
+
+  const avgImpact =
+      headlines.reduce((sum, h) => sum + h.impact, 0) /
+      Math.max(headlines.length, 1);
+
+  let insight;
+
+  if (bullishPct > bearishPct) {
+
+      insight =
+          `${dominantTheme} headlines dominate today's market with ${bullishPct}% bullish sentiment and an average impact score of ${avgImpact.toFixed(1)}.`;
+
+  } else if (bearishPct > bullishPct) {
+
+      insight =
+          `${dominantTheme} headlines are creating downside pressure with ${bearishPct}% bearish sentiment and an average impact score of ${avgImpact.toFixed(1)}.`;
+
+  } else {
+
+      insight =
+          `News flow remains balanced across ${dominantTheme} developments with no dominant directional bias.`;
+
+  }
+
+
+  let ringClass;
+  let textClass;
+
+  if (bullishPct >= 70) {
+
+      ringClass = "border-green-400";
+      textClass = "text-green-400";
+
+  } else if (bullishPct >= 45) {
+
+      ringClass = "border-yellow-400";
+      textClass = "text-yellow-400";
+
+  } else {
+
+      ringClass = "border-red-400";
+      textClass = "text-red-400";
+
+  }
+
+  const buildReaction = (signal) => ({
+      signal,
+      textClass:
+          signal === "Bullish"
+              ? "text-green-400"
+              : signal === "Bearish"
+              ? "text-red-400"
+              : "text-gray-400",
+  });
+
+  const marketReaction = {
+
+      WTI: buildReaction(
+          bullishPct > bearishPct
+              ? "Bullish"
+              : bearishPct > bullishPct
+              ? "Bearish"
+              : "Neutral"
+      ),
+
+      Brent: buildReaction(
+          bullishPct > bearishPct
+              ? "Bullish"
+              : bearishPct > bullishPct
+              ? "Bearish"
+              : "Neutral"
+      ),
+
+      HeatingOil: buildReaction(
+          topThemes.some(t => t.name === "Refining")
+              ? "Bullish"
+              : "Neutral"
+      ),
+
+      Gasoline: buildReaction(
+          topThemes.some(t => t.name === "Inventory")
+              ? "Bearish"
+              : "Neutral"
+      ),
+
+      NaturalGas: buildReaction("Neutral"),
+  };
+
+  const filters = [
+
+  "All",
+
+  ...new Set([
+
+  ...headlines.map(h => h.sentiment),
+
+  ...headlines.map(h => h.category),
+
+  ...headlines.flatMap(h => h.tags || [])
+
+  ])
+
+  ];
+  
+  return {
+
+      live:true,
+
+      lastUpdated:new Date().toISOString(),
+
+      summary:{
+
+          total:headlines.length,
+
+          bullish:bullishPct,
+
+          bearish:bearishPct,
+
+          neutral:neutralPct,
+
+          overallScore:bullishPct,
+
+          label:
+              bullishPct>bearishPct
+                  ?"Bullish"
+                  :"Bearish",
+
+          insight,
+
+          themes: topThemes,
+
+          averageImpact: Number(avgImpact.toFixed(1)),
+
+          ringClass,
+
+          textClass,
+
+          marketReaction,
+
+          progressBars: [
+
+          {
+          label: "Bullish Headlines",
+          value: bullishPct,
+          barClass: "bg-green-400",
+          },
+
+          {
+          label: "Bearish Headlines",
+          value: bearishPct,
+          barClass: "bg-red-400",
+          },
+
+          {
+          label: "Neutral Headlines",
+          value: neutralPct,
+          barClass: "bg-gray-400",
+          },
+
+          ],
+
+          filters,
+
+          progressBars: [
+            {
+              label: "Bullish Headlines",
+              value: bullishPct,
+              barClass: "bg-green-400",
+            },
+            {
+              label: "Bearish Headlines",
+              value: bearishPct,
+              barClass: "bg-red-400",
+            },
+            {
+              label: "Neutral Headlines",
+              value: neutralPct,
+              barClass: "bg-gray-400",
+            },
+          ],
+
+      },
+
+      narrative:buildNarrative(headlines),
+
+      headlines
+
+  }
+}
+
+function buildNarrative(news){
+
+    const freq={};
+
+    news.forEach(item=>{
+
+        freq[item.category] =
+            (freq[item.category]||0)+1;
+
+    });
+
+    const top =
+        Object.entries(freq)
+        .sort((a,b)=>b[1]-a[1])[0];
+
+    return{
+
+        title:top?top[0]:"None",
+
+        description:
+            top
+                ?`${top[0]} is dominating today's news flow.`
+                :"Waiting for news.",
+
+        mentions:top?top[1]:0
+
+    };
+
 }
 
 async function fetchLiveCftc() {
@@ -867,14 +1230,95 @@ function normalizeFeed(feedName, json) {
         if (!headline || headline === '[Removed]') return null;
         const text = `${headline} ${article.description ?? ''} ${article.content ?? ''}`;
         const scored = scoreNews(text);
+        const domain =
+          article.url
+              ? new URL(article.url).hostname
+              : "";
+
+        const readingTime =
+            `${Math.max(
+                1,
+                Math.ceil(
+                    text.split(" ").length / 200
+                )
+            )} min`;
         return {
-          headline,
-          category: classifyNews(text),
-          sentiment: scored.sentiment,
-          impact: scored.impact,
-          source: article.source?.name ?? article.source ?? 'NewsAPI',
-          url: article.url,
-          publishedAt: article.publishedAt ?? article.published_at,
+
+            headline,
+
+            description:
+                article.description ??
+                article.content ??
+                "",
+
+            summary:
+                article.description ??
+                article.content ??
+                "",
+
+            category: classifyNews(text),
+
+            sentiment: scored.sentiment,
+
+            impact: scored.impact,
+
+            importance: scored.importance,
+
+            importanceColor:
+              scored.importance === "Critical"
+                  ? "bg-red-500/20 text-red-300"
+                  : scored.importance === "High"
+                  ? "bg-orange-500/20 text-orange-300"
+                  : scored.importance === "Medium"
+                  ? "bg-yellow-500/20 text-yellow-300"
+                  : "bg-gray-500/20 text-gray-300",
+
+            sentimentColor:
+              scored.sentiment === "Bullish"
+                  ? "green"
+                  : scored.sentiment === "Bearish"
+                  ? "red"
+                  : "gray",
+
+            sentimentBadgeClass:
+              scored.sentiment === "Bullish"
+                  ? "bg-green-500/10 text-green-300"
+                  : scored.sentiment === "Bearish"
+                  ? "bg-red-500/10 text-red-300"
+                  : "bg-gray-500/10 text-gray-300",
+
+            source:
+                article.source?.name ??
+                article.source ??
+                "NewsAPI",
+
+            author:
+                article.author ??
+                "Unknown",
+
+            domain,
+
+            url:
+                article.url,
+
+            image:
+                article.urlToImage ??
+                null,
+
+            publishedAt:
+                article.publishedAt ??
+                article.published_at,
+
+            relativeTime:
+                relativeTime(
+                    article.publishedAt ??
+                    article.published_at
+                ),
+
+            readingTime,
+
+            tags:
+                extractTags(text)
         };
       })
       .filter(Boolean)
@@ -1611,9 +2055,13 @@ app.get('/api/news', async (req, res) => {
     return res.json({ data: await fetchLiveNews(), ts: Date.now(), source: 'newsapi' });
   } catch (err) {
     console.error('newsapi error', err);
+    return res.status(500).json({
+    error: err.message,
+    stack: err.stack
+  });
   }
 
-  return res.status(500).json({ error: 'News data unavailable', ts: Date.now(), source: 'error' });
+  // return res.status(500).json({ error: 'News data unavailable', ts: Date.now(), source: 'error' });
 });
 app.get('/api/inventory', async (req, res) => {
   try {
@@ -1832,8 +2280,7 @@ app.get('/api/rolling-models', (req, res) => {
 
 
 
-app.get(
-  "/api/regime-counts",
+app.get("/api/regime-counts",
   (_, res) => {
 
 
@@ -1872,8 +2319,7 @@ app.get(
   }
 );
 
-app.get(
-  "/api/regime-stats",
+app.get("/api/regime-stats",
   (_, res) => {
 
     try {
@@ -1948,9 +2394,7 @@ app.get(
 );
 
 
-app.get(
-
-    "/api/signal-log",
+app.get("/api/signal-log",
 
     (req, res) => {
 

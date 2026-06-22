@@ -50,10 +50,11 @@ export default function MasterDashboard() {
   };
 
 
-  const latestNews = useMemo(
-    () => (liveNews ?? []).slice(0, 5),
-    [liveNews]
-  );
+  const latestNews = useMemo(() => {
+    return Array.isArray(liveNews?.headlines)
+      ? liveNews.headlines.slice(0, 5)
+      : [];
+  }, [liveNews]);;
 
   const formatTimestamp = (value) => {
 

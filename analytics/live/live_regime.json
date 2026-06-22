@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-18T09:52:01.776994+00:00",
+  "timestamp": "2026-06-22T05:27:01.850858+00:00",
   "regime": "BACKWARDATION_HIGH_VOL_STRONG_PRODUCTS_TIGHT_WB",
   "drivers": {
     "curve": "BACKWARDATION",
@@ -8,8 +8,8 @@
     "wb": "TIGHT_WB"
   },
   "values": {
-    "CL_VOL20": 53.65,
-    "WB_C1": -4.03,
-    "HO_CL_DIFF": -70.9379
+    "CL_VOL20": 51.54,
+    "WB_C1": -3.74,
+    "HO_CL_DIFF": -72.1784
   }
 }
